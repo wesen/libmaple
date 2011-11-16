@@ -1,7 +1,7 @@
 /******************************************************************************
  * The MIT License
  *
- * Copyright (c) 2010 Perry Hung.
+ * Copyright (c) 2011 LeafLabs, LLC.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,29 +24,44 @@
  * SOFTWARE.
  *****************************************************************************/
 
-/**
- * @file libmaple/flash.c
- * @brief Flash management functions
+/*
+ * RCC private header.
  */
 
-#include <libmaple/libmaple_types.h>
-#include <libmaple/flash.h>
+#ifndef _LIBMAPLE_PRIVATE_RCC_H_
+#define _LIBMAPLE_PRIVATE_RCC_H_
 
-/**
- * @brief Set flash wait states
- *
- * See ST PM0042, section 3.1 for restrictions on the acceptable value
- * of wait_states for a given SYSCLK configuration.
- *
- * @param wait_states number of wait states (one of
- *                    FLASH_WAIT_STATE_0, FLASH_WAIT_STATE_1,
- *                    FLASH_WAIT_STATE_2).
- */
-void flash_set_latency(uint32 wait_states) {
-    uint32 val = FLASH_BASE->ACR;
+#include <libmaple/bitband.h>
 
-    val &= ~FLASH_ACR_LATENCY;
-    val |= wait_states;
+struct rcc_dev_info {
+    const rcc_clk_domain clk_domain;
+    const uint8 line_num;
+};
 
-    FLASH_BASE->ACR = val;
+extern const struct rcc_dev_info rcc_dev_table[];
+
+static inline void rcc_do_clk_enable(__io uint32** enable_regs,
+                                     rcc_clk_id id) {
+    __io uint32 *enable_reg = enable_regs[rcc_dev_clk(id)];
+    uint8 line_num = rcc_dev_table[id].line_num;
+    bb_peri_set_bit(enable_reg, line_num, 1);
 }
+
+static inline void rcc_do_reset_dev(__io uint32** reset_regs,
+                                    rcc_clk_id id) {
+    __io uint32 *reset_reg = reset_regs[rcc_dev_clk(id)];
+    uint8 line_num = rcc_dev_table[id].line_num;
+    bb_peri_set_bit(reset_reg, line_num, 1);
+    bb_peri_set_bit(reset_reg, line_num, 0);
+}
+
+static inline void rcc_do_set_prescaler(const uint32 *masks,
+                                        rcc_prescaler prescaler,
+                                        uint32 divider) {
+    uint32 cfgr = RCC_BASE->CFGR;
+    cfgr &= ~masks[prescaler];
+    cfgr |= divider;
+    RCC_BASE->CFGR = cfgr;
+}
+
+#endif
