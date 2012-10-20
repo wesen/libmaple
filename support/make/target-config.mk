@@ -1,5 +1,16 @@
 # Board-specific configuration values.  Flash and SRAM sizes in bytes.
 
+ifeq ($(BOARD), formlabs_alpha)
+   MCU := STM32F103RC
+   PRODUCT_ID := 0003
+   ERROR_LED_PORT := GPIOA      # UI6
+   ERROR_LED_PIN  := 1
+   DENSITY := STM32_HIGH_DENSITY
+   FLASH_SIZE := 262144
+   SRAM_SIZE := 65536
+endif
+
+
 ifeq ($(BOARD), maple)
    MCU := STM32F103RB
    PRODUCT_ID := 0003

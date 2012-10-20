@@ -58,4 +58,9 @@ static inline void enableDebugPorts(void) {
     afio_cfg_debug_ports(AFIO_DEBUG_FULL_SWJ);
 }
 
+// Added by AK // 
+static inline void enableSWDebugOnly(void) {
+  afio_cfg_debug_ports(AFIO_DEBUG_SW_ONLY);
+}
+
 #endif

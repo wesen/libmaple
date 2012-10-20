@@ -133,6 +133,11 @@ void HardwareTimer::refresh(void) {
     timer_generate_update(this->dev);
 }
 
+// Added by AK to support interrupts for basic timers
+void HardwareTimer::attachUpdateInterrupt(voidFuncPtr handler) {
+    timer_attach_interrupt(this->dev, TIMER_UPDATE_INTERRUPT, handler);
+}
+
 /* -- Deprecated predefined instances -------------------------------------- */
 
 HardwareTimer Timer1(1);

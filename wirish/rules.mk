@@ -18,6 +18,7 @@ cSRCS_$(d) := start_c.c
 cppSRCS_$(d) := wirish_math.cpp		 \
                 Print.cpp		 \
 		boards.cpp               \
+                boards/formlabs_alpha.cpp \
                 boards/maple.cpp	 \
                 boards/maple_mini.cpp	 \
                 boards/maple_native.cpp	 \

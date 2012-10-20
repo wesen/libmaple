@@ -148,6 +148,16 @@
     #define NR_GPIO_PORTS               STM32_NR_GPIO_PORTS
     #define DELAY_US_MULT               STM32_DELAY_US_MULT
 
+#elif defined(MCU_STM32F103RC)
+    // Formlabs Alpha
+
+    #define STM32_NR_GPIO_PORTS         3                    // PD is only osc
+    #define STM32_DELAY_US_MULT         12
+    #define STM32_SRAM_END              ((void*)0x20010000)  // 64K
+
+    #define NR_GPIO_PORTS               STM32_NR_GPIO_PORTS
+    #define DELAY_US_MULT               STM32_DELAY_US_MULT
+
 #elif defined(MCU_STM32F103ZE)
     /* e.g., LeafLabs Maple Native */
 

@@ -191,6 +191,18 @@ public:
      * @param channel the channel whose interrupt to detach, from 1 to 4.
      * @see HardwareTimer::attachInterrupt()
      */
+
+    void attachUpdateInterrupt(voidFuncPtr handler);
+
+    /**
+     * @brief Remove the interrupt handler attached to the given
+     *        timer.
+     *
+     * The handler will no longer be called by this timer.
+     *
+     * @param channel the channel whose interrupt to detach, from 1 to 4.
+     * @see HardwareTimer::attachInterrupt()
+     */
     void detachInterrupt(int channel);
 
     /**
