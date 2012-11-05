@@ -13,9 +13,8 @@ CFLAGS_$(d) := $(WIRISH_INCLUDES) $(LIBMAPLE_INCLUDES)
 
 # Local rules and targets
 
-cSRCS_$(d) :=
-sSRCS_$(d) :=
- 
+sSRCS_$(d) := start.S
+cSRCS_$(d) := start_c.c
 cppSRCS_$(d) := wirish_math.cpp		 \
                 Print.cpp		 \
 		boards.cpp               \
