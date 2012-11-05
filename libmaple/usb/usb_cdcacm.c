@@ -31,12 +31,13 @@
  *        routines.
  */
 
-#include "usb_cdcacm.h"
+#include <libmaple/usb_cdcacm.h>
 
-#include "nvic.h"
-#include "delay.h"
+#include <libmaple/usb.h>
+#include <libmaple/nvic.h>
+#include <libmaple/delay.h>
 
-#include "usb.h"
+/* Private headers */
 #include "usb_descriptors.h"
 #include "usb_lib_globals.h"
 #include "usb_reg_map.h"
@@ -59,12 +60,8 @@
 
 #if !(defined(BOARD_maple) || defined(BOARD_maple_RET6) ||      \
       defined(BOARD_maple_mini) || defined(BOARD_maple_native))
-
-//#warning ("Warning! USB VCOM relies on LeafLabs board-specific "	
-//          "configuration right now.  If you want, you can pretend "	
-//          "you're one of our boards; i.e., #define BOARD_maple, "	
-//          "BOARD_maple_mini, etc.  according to what matches your MCU "
-//          "best."
+#warning USB CDC ACM relies on LeafLabs board-specific configuration.\
+    You may have problems on non-LeafLabs boards.
 #endif
 
 static void vcomDataTxCb(void);

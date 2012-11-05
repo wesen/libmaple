@@ -17,8 +17,6 @@ ifeq ($(BOARD), maple)
    ERROR_LED_PORT := GPIOA
    ERROR_LED_PIN  := 5
    DENSITY := STM32_MEDIUM_DENSITY
-   FLASH_SIZE := 131072
-   SRAM_SIZE := 20480
 endif
 
 ifeq ($(BOARD), maple_native)
@@ -27,8 +25,6 @@ ifeq ($(BOARD), maple_native)
    ERROR_LED_PORT := GPIOC
    ERROR_LED_PIN  := 15
    DENSITY := STM32_HIGH_DENSITY
-   FLASH_SIZE := 524288
-   SRAM_SIZE := 65536
 endif
 
 ifeq ($(BOARD), maple_mini)
@@ -37,8 +33,6 @@ ifeq ($(BOARD), maple_mini)
    ERROR_LED_PORT := GPIOB
    ERROR_LED_PIN  := 1
    DENSITY := STM32_MEDIUM_DENSITY
-   FLASH_SIZE := 131072
-   SRAM_SIZE := 20480
 endif
 
 ifeq ($(BOARD), maple_RET6)
@@ -47,8 +41,6 @@ ifeq ($(BOARD), maple_RET6)
    ERROR_LED_PORT := GPIOA
    ERROR_LED_PIN := 5
    DENSITY := STM32_HIGH_DENSITY
-   FLASH_SIZE := 524288
-   SRAM_SIZE := 65536
 endif
 
 ifeq ($(BOARD), olimex_stm32_h103)
@@ -57,8 +49,6 @@ ifeq ($(BOARD), olimex_stm32_h103)
    ERROR_LED_PORT := GPIOC
    ERROR_LED_PIN := 12
    DENSITY := STM32_MEDIUM_DENSITY
-   FLASH_SIZE := 131072
-   SRAM_SIZE := 20480
 endif
 
 # STM32 family-specific configuration values.
@@ -67,7 +57,7 @@ endif
 # are the only ones we support at this time.  If you add support for
 # STM32F1 connectivity line MCUs or other STM32 families, this section
 # will need to change.
-LD_FAMILY_PATH := $(LDDIR)/stm32/f1/performance
+LD_FAMILY_PATH := $(LDDIR)/stm32/family/f1/performance
 LIBMAPLE_MODULE_FAMILY := $(LIBMAPLE_PATH)/stm32f1
 
 # Memory target-specific configuration values

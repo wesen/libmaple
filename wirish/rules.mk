@@ -3,10 +3,20 @@ sp              := $(sp).x
 dirstack_$(sp)  := $(d)
 d               := $(dir)
 BUILDDIRS       += $(BUILD_PATH)/$(d)
-BUILDDIRS       += $(BUILD_PATH)/$(d)/comm
-BUILDDIRS       += $(BUILD_PATH)/$(d)/boards
 
-WIRISH_INCLUDES := -I$(d) -I$(d)/comm -I$(d)/boards
+WIRISH_INCLUDES := -I$(d)/include
+
+# Board config -- TODO allow user override
+ifeq ($(WIRISH_BOARD_PATH),)
+WIRISH_BOARD_PATH := boards/$(BOARD)
+BUILDDIRS += $(BUILD_PATH)/$(d)/$(WIRISH_BOARD_PATH)
+WIRISH_INCLUDES += -I$(d)/$(WIRISH_BOARD_PATH)/include
+else
+BUILDDIRS += $(WIRISH_BOARD_PATH)
+WIRISH_INCLUDES += -I$(WIRISH_BOARD_PATH)/include
+endif
+
+cppSRCS_$(d) += $(WIRISH_BOARD_PATH)/board.cpp
 
 # Local flags
 CFLAGS_$(d) := $(WIRISH_INCLUDES) $(LIBMAPLE_INCLUDES)
@@ -18,13 +28,8 @@ cSRCS_$(d) := start_c.c
 cppSRCS_$(d) := wirish_math.cpp		 \
                 Print.cpp		 \
 		boards.cpp               \
-                boards/maple.cpp	 \
-                boards/maple_mini.cpp	 \
-                boards/maple_native.cpp	 \
-                boards/maple_RET6.cpp	 \
-                boards/olimex_stm32_h103.cpp \
-                comm/HardwareSerial.cpp	 \
-                comm/HardwareSPI.cpp	 \
+                HardwareSerial.cpp	 \
+                HardwareSPI.cpp		 \
 		HardwareTimer.cpp	 \
                 usb_serial.cpp		 \
                 cxxabi-compat.cpp	 \

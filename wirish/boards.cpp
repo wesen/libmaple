@@ -32,16 +32,16 @@
  * at 72MHz.  APB1 is clocked at 36MHz.
  */
 
-#include "boards.h"
+#include <wirish/boards.h>
 
-#include "flash.h"
-#include "rcc.h"
-#include "nvic.h"
-#include "systick.h"
-#include "gpio.h"
-#include "adc.h"
-#include "timer.h"
-#include "usb_cdcacm.h"
+#include <libmaple/flash.h>
+#include <libmaple/rcc.h>
+#include <libmaple/nvic.h>
+#include <libmaple/systick.h>
+#include <libmaple/gpio.h>
+#include <libmaple/adc.h>
+#include <libmaple/timer.h>
+#include <libmaple/usb_cdcacm.h>
 
 static void setupFlash(void);
 static void setupClocks(void);
