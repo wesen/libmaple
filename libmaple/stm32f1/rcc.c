@@ -27,7 +27,7 @@
 
 /**
  * @file libmaple/stm32f1/rcc.c
- * @brief STM32F1 RCC routines.
+ * @brief STM32F1 RCC.
  */
 
 #include <libmaple/rcc.h>
@@ -95,19 +95,10 @@ const struct rcc_dev_info rcc_dev_table[] = {
 #endif
 };
 
-/**
- * @brief Initialize the clock control system. Initializes the system
- *        clock source to use the PLL driven by an external oscillator
- * @param sysclk_src system clock source, must be PLL
- * @param pll_src pll clock source, must be HSE
- * @param pll_mul pll multiplier
- */
+__deprecated
 void rcc_clk_init(rcc_sysclk_src sysclk_src,
                   rcc_pllsrc pll_src,
                   rcc_pll_multiplier pll_mul) {
-    uint32 cfgr = 0;
-    uint32 cr;
-
     /* Assume that we're going to clock the chip off the PLL, fed by
      * the HSE */
     ASSERT(sysclk_src == RCC_CLKSRC_PLL &&
@@ -115,31 +106,35 @@ void rcc_clk_init(rcc_sysclk_src sysclk_src,
 
     RCC_BASE->CFGR = pll_src | pll_mul;
 
-    /* Turn on the HSE */
-    cr = RCC_BASE->CR;
-    cr |= RCC_CR_HSEON;
-    RCC_BASE->CR = cr;
-    while (!(RCC_BASE->CR & RCC_CR_HSERDY))
+    /* Turn on, and wait for, HSE. */
+    rcc_turn_on_clk(RCC_CLK_HSE);
+    while (!rcc_is_clk_ready(RCC_CLK_HSE))
         ;
 
-    /* Now the PLL */
-    cr |= RCC_CR_PLLON;
-    RCC_BASE->CR = cr;
-    while (!(RCC_BASE->CR & RCC_CR_PLLRDY))
+    /* Do the same for the main PLL. */
+    rcc_turn_on_clk(RCC_CLK_PLL);
+    while(!rcc_is_clk_ready(RCC_CLK_PLL))
         ;
 
-    /* Finally, let's switch over to the PLL */
-    cfgr &= ~RCC_CFGR_SW;
-    cfgr |= RCC_CFGR_SW_PLL;
-    RCC_BASE->CFGR = cfgr;
-    while ((RCC_BASE->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL)
-        ;
+    /* Finally, switch over to the PLL. */
+    rcc_switch_sysclk(RCC_CLKSRC_PLL);
 }
 
-/**
- * @brief Turn on the clock line on a peripheral
- * @param id Clock ID of the peripheral to turn on.
- */
+/* pll_cfg->data must point to a valid struct stm32f1_rcc_pll_data. */
+void rcc_configure_pll(rcc_pll_cfg *pll_cfg) {
+    stm32f1_rcc_pll_data *data = pll_cfg->data;
+    rcc_pll_multiplier pll_mul = data->pll_mul;
+    uint32 cfgr;
+
+    /* Check that the PLL is disabled. */
+    ASSERT_FAULT(!rcc_is_clk_on(RCC_CLK_PLL));
+
+    cfgr = RCC_BASE->CFGR;
+    cfgr &= ~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLMUL);
+    cfgr |= pll_cfg->pllsrc | pll_mul;
+    RCC_BASE->CFGR = cfgr;
+}
+
 void rcc_clk_enable(rcc_clk_id id) {
     static __io uint32* enable_regs[] = {
         [APB1] = &RCC_BASE->APB1ENR,
@@ -149,14 +144,6 @@ void rcc_clk_enable(rcc_clk_id id) {
     rcc_do_clk_enable(enable_regs, id);
 }
 
-/**
- * @brief Reset a peripheral.
- *
- * Caution: not all rcc_clk_id values refer to a peripheral which can
- * be reset.
- *
- * @param id Clock ID of the peripheral to reset.
- */
 void rcc_reset_dev(rcc_clk_id id) {
     static __io uint32* reset_regs[] = {
         [APB1] = &RCC_BASE->APB1RSTR,
@@ -165,11 +152,6 @@ void rcc_reset_dev(rcc_clk_id id) {
     rcc_do_reset_dev(reset_regs, id);
 }
 
-/**
- * @brief Set the divider on a peripheral prescaler
- * @param prescaler prescaler to set
- * @param divider prescaler divider
- */
 void rcc_set_prescaler(rcc_prescaler prescaler, uint32 divider) {
     static const uint32 masks[] = {
         [RCC_PRESCALER_AHB] = RCC_CFGR_HPRE,

@@ -25,15 +25,10 @@
  *****************************************************************************/
 
 /**
- * @file boards.h
+ * @file wirish/include/wirish/boards.h
  * @author Bryan Newbold <bnewbold@leaflabs.com>,
  *         Marti Bolivar <mbolivar@leaflabs.com>
- * @brief Board-specific pin information.
- *
- * To add a new board type, add a new pair of files to
- * /wirish/boards/, update the section below with a new "BOARD" type,
- * and update /wirish/rules.mk to include your boards/your_board.cpp
- * file in the top-level Makefile build.
+ * @brief init() and board-specific pin information.
  */
 
 #ifndef _WIRISH_BOARDS_H_
@@ -115,8 +110,64 @@ extern void boardInit(void);
  */
 bool boardUsesPin(uint8 pin);
 
-/* Set derived definitions */
+/*
+ * Derived and default board definitions
+ */
+
 #define CLOCK_SPEED_MHZ                 CYCLES_PER_MICROSECOND
 #define CLOCK_SPEED_HZ                  (CLOCK_SPEED_MHZ * 1000000UL)
+
+#ifndef SYSTICK_RELOAD_VAL
+#define SYSTICK_RELOAD_VAL              (1000 * CYCLES_PER_MICROSECOND - 1)
+#endif
+
+#ifndef BOARD_BUTTON_PRESSED_LEVEL
+#define BOARD_BUTTON_PRESSED_LEVEL      HIGH
+#endif
+
+/**
+ * @brief Does the board break out a USART/UART's RX and TX pins?
+ *
+ * BOARD_HAVE_USART(n) is nonzero iff USARTn is available (n must be
+ * an integer literal, 1 through 6). Also see BOARD_HAVE_USART1, ...,
+ * BOARD_HAVE_UART4 (sic), etc.
+ */
+#define BOARD_HAVE_USART(n) (defined(BOARD_USART##n##_TX_PIN) && \
+                             defined(BOARD_USART##n##_RX_PIN))
+/** Feature test: nonzero iff the board has USART1. */
+#define BOARD_HAVE_USART1               BOARD_HAVE_USART(1)
+/** Feature test: nonzero iff the board has USART2, 0 otherwise. */
+#define BOARD_HAVE_USART2               BOARD_HAVE_USART(2)
+/** Feature test: nonzero iff the board has USART3, 0 otherwise. */
+#define BOARD_HAVE_USART3               BOARD_HAVE_USART(3)
+/** Feature test: nonzero iff the board has UART4, 0 otherwise. */
+#define BOARD_HAVE_UART4                BOARD_HAVE_USART(4)
+/** Feature test: nonzero iff the board has UART5, 0 otherwise. */
+#define BOARD_HAVE_UART5                BOARD_HAVE_USART(5)
+/** Feature test: nonzero iff the board has USART6, 0 otherwise. */
+#define BOARD_HAVE_USART6               BOARD_HAVE_USART(6)
+
+/**
+ * @brief Does the board break out a SPI peripheral's pins?
+ *
+ * BOARD_HAVE_SPI(n) is nonzero iff SPIn is available (n must be an
+ * integer literal: 1, 2, or 3). Also see BOARD_HAVE_SPI1,
+ * BOARD_HAVE_SPI2, BOARD_HAVE_SPI3. */
+#define BOARD_HAVE_SPI(n) (defined(BOARD_SPI##n##_NSS_PIN)  &&          \
+                           defined(BOARD_SPI##n##_SCK_PIN)  &&          \
+                           defined(BOARD_SPI##n##_MISO_PIN) &&          \
+                           defined(BOARD_SPI##n##_MOSI_PIN))
+/** Feature test: nonzero iff the board has SPI1. */
+#define BOARD_HAVE_SPI1 BOARD_HAVE_SPI(1)
+/** Feature test: nonzero iff the board has SPI2. */
+#define BOARD_HAVE_SPI2 BOARD_HAVE_SPI(2)
+/** Feature test: nonzero iff the board has SPI3. */
+#define BOARD_HAVE_SPI3 BOARD_HAVE_SPI(3)
+
+/**
+ * @brief Feature test: nonzero iff the board has SerialUSB.
+ */
+#define BOARD_HAVE_SERIALUSB (defined(BOARD_USB_DISC_DEV) && \
+                              defined(BOARD_USB_DISC_BIT))
 
 #endif

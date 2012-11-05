@@ -25,9 +25,8 @@
  *****************************************************************************/
 
 /**
- *  @file io.h
- *
- *  @brief Arduino-compatible digital pin I/O interface.
+ * @file wirish/include/wirish/io.h
+ * @brief Wiring-style pin I/O interface.
  */
 
 #ifndef _WIRISH_IO_H_
@@ -182,7 +181,8 @@ static inline void toggleLED() {
  *
  * @see pinMode()
  */
-uint8 isButtonPressed();
+uint8 isButtonPressed(uint8 pin=BOARD_BUTTON_PIN,
+                      uint32 pressedLevel=BOARD_BUTTON_PRESSED_LEVEL);
 
 /**
  * Wait until the button is pressed and released, timing out if no

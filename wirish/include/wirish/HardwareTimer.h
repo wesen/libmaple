@@ -38,9 +38,6 @@
 /** Timer mode. */
 typedef timer_mode TimerMode;
 
-/** @brief Deprecated; use TIMER_OUTPUT_COMPARE instead. */
-#define TIMER_OUTPUTCOMPARE TIMER_OUTPUT_COMPARE
-
 /**
  * @brief Interface to one of the 16-bit timer peripherals.
  */
@@ -220,7 +217,7 @@ public:
      */
     void refresh(void);
 
-    /* -- Deprecated methods ----------------------------------------------- */
+/* -- The rest of this file is deprecated. --------------------------------- */
 
     /** @brief Deprecated; use setMode(channel, mode) instead. */
     void setChannelMode(int channel, timer_mode mode) {
@@ -299,7 +296,8 @@ public:
     void generateUpdate(void) { refresh(); }
 };
 
-/* -- The rest of this file is deprecated. --------------------------------- */
+/** @brief Deprecated; use TIMER_OUTPUT_COMPARE instead. */
+#define TIMER_OUTPUTCOMPARE TIMER_OUTPUT_COMPARE
 
 /**
  * @brief Deprecated.
@@ -325,7 +323,7 @@ extern HardwareTimer Timer3;
  * Pre-instantiated timer.
  */
 extern HardwareTimer Timer4;
-#ifdef STM32_HIGH_DENSITY
+#if (STM32_MCU_SERIES == STM32_SERIES_F1) && defined(STM32_HIGH_DENSITY)
 /**
  * @brief Deprecated.
  *

@@ -25,7 +25,7 @@
  *****************************************************************************/
 
 /**
- * @file wirish_debug.h
+ * @file wirish/include/wirish/wirish_debug.h
  * @brief High level debug port configuration
  */
 
@@ -42,9 +42,7 @@
  *
  * @see enableDebugPorts()
  */
-static inline void disableDebugPorts(void) {
-    afio_cfg_debug_ports(AFIO_DEBUG_NONE);
-}
+void disableDebugPorts(void);
 
 /**
  * @brief Enable the JTAG and Serial Wire (SW) debug ports.
@@ -54,9 +52,7 @@ static inline void disableDebugPorts(void) {
  *
  * @see disableDebugPorts()
  */
-static inline void enableDebugPorts(void) {
-    afio_cfg_debug_ports(AFIO_DEBUG_FULL_SWJ);
-}
+void enableDebugPorts(void);
 
 // Added by AK // 
 static inline void enableSWDebugOnly(void) {

@@ -25,9 +25,9 @@
  *****************************************************************************/
 
 /**
- *  @file libmaple_types.h
+ *  @file libmaple/include/libmaple/libmaple_types.h
  *
- *  @brief libmaple types
+ *  @brief libmaple's types, and operations on types.
  */
 
 #ifndef _LIBMAPLE_LIBMAPLE_TYPES_H_
@@ -52,9 +52,17 @@ typedef void (*voidFuncPtr)(void);
 #define __io volatile
 #define __attr_flash __attribute__((section (".USER_FLASH")))
 #define __packed __attribute__((__packed__))
+#define __deprecated __attribute__((__deprecated__))
+#define __weak __attribute__((weak))
+#define __always_inline inline __attribute__((always_inline))
+#define __unused __attribute__((unused))
 
 #ifndef NULL
 #define NULL 0
+#endif
+
+#ifndef offsetof
+#define offsetof(type, member) __builtin_offsetof(type, member)
 #endif
 
 #ifdef __cplusplus

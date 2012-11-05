@@ -25,7 +25,7 @@
  *****************************************************************************/
 
 /**
- * @file iwdg.h
+ * @file libmaple/include/libmaple/iwdg.h
  * @author Michael Hope, Marti Bolivar <mbolivar@leaflabs.com>
  * @brief Independent watchdog support.
  *
@@ -46,7 +46,6 @@ extern "C"{
 #endif
 
 #include <libmaple/libmaple_types.h>
-#include <libmaple/util.h>
 
 /*
  * Register map
@@ -88,8 +87,8 @@ typedef struct iwdg_reg_map {
 #define IWDG_SR_RVU_BIT                 1
 #define IWDG_SR_PVU_BIT                 0
 
-#define IWDG_SR_RVU                     BIT(IWDG_SR_RVU_BIT)
-#define IWDG_SR_PVU                     BIT(IWDG_SR_PVU_BIT)
+#define IWDG_SR_RVU                     (1U << IWDG_SR_RVU_BIT)
+#define IWDG_SR_PVU                     (1U << IWDG_SR_PVU_BIT)
 
 /**
  * @brief Independent watchdog prescalers.

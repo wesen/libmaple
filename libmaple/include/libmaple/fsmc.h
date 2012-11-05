@@ -25,7 +25,7 @@
  *****************************************************************************/
 
 /**
- * @file fsmc.h
+ * @file libmaple/include/libmaple/fsmc.h
  * @brief Flexible static memory controller support.
  */
 
@@ -41,8 +41,11 @@ extern "C"{
 #endif
 
 #include <libmaple/libmaple_types.h>
+#include <libmaple/stm32.h>
 
-#ifdef STM32_HIGH_DENSITY
+#if !STM32_HAVE_FSMC
+#error "FSMC is unavailable on your MCU"
+#endif
 
 /*
  * Register maps and devices
@@ -132,16 +135,16 @@ typedef struct fsmc_nor_psram_reg_map {
 #define FSMC_BCR_MUXEN_BIT              1
 #define FSMC_BCR_MBKEN_BIT              0
 
-#define FSMC_BCR_CBURSTRW               BIT(FSMC_BCR_CBURSTRW_BIT)
-#define FSMC_BCR_ASYNCWAIT              BIT(FSMC_BCR_ASYNCWAIT_BIT)
-#define FSMC_BCR_EXTMOD                 BIT(FSMC_BCR_EXTMOD_BIT)
-#define FSMC_BCR_WAITEN                 BIT(FSMC_BCR_WAITEN_BIT)
-#define FSMC_BCR_WREN                   BIT(FSMC_BCR_WREN_BIT)
-#define FSMC_BCR_WAITCFG                BIT(FSMC_BCR_WAITCFG_BIT)
-#define FSMC_BCR_WRAPMOD                BIT(FSMC_BCR_WRAPMOD_BIT)
-#define FSMC_BCR_WAITPOL                BIT(FSMC_BCR_WAITPOL_BIT)
-#define FSMC_BCR_BURSTEN                BIT(FSMC_BCR_BURSTEN_BIT)
-#define FSMC_BCR_FACCEN                 BIT(FSMC_BCR_FACCEN_BIT)
+#define FSMC_BCR_CBURSTRW               (1U << FSMC_BCR_CBURSTRW_BIT)
+#define FSMC_BCR_ASYNCWAIT              (1U << FSMC_BCR_ASYNCWAIT_BIT)
+#define FSMC_BCR_EXTMOD                 (1U << FSMC_BCR_EXTMOD_BIT)
+#define FSMC_BCR_WAITEN                 (1U << FSMC_BCR_WAITEN_BIT)
+#define FSMC_BCR_WREN                   (1U << FSMC_BCR_WREN_BIT)
+#define FSMC_BCR_WAITCFG                (1U << FSMC_BCR_WAITCFG_BIT)
+#define FSMC_BCR_WRAPMOD                (1U << FSMC_BCR_WRAPMOD_BIT)
+#define FSMC_BCR_WAITPOL                (1U << FSMC_BCR_WAITPOL_BIT)
+#define FSMC_BCR_BURSTEN                (1U << FSMC_BCR_BURSTEN_BIT)
+#define FSMC_BCR_FACCEN                 (1U << FSMC_BCR_FACCEN_BIT)
 #define FSMC_BCR_MWID                   (0x3 << 4)
 #define FSMC_BCR_MWID_8BITS             (0x0 << 4)
 #define FSMC_BCR_MWID_16BITS            (0x1 << 4)
@@ -149,8 +152,8 @@ typedef struct fsmc_nor_psram_reg_map {
 #define FSMC_BCR_MTYP_SRAM              (0x0 << 2)
 #define FSMC_BCR_MTYP_PSRAM             (0x1 << 2)
 #define FSMC_BCR_MTYP_NOR_FLASH         (0x2 << 2)
-#define FSMC_BCR_MUXEN                  BIT(FSMC_BCR_MUXEN_BIT)
-#define FSMC_BCR_MBKEN                  BIT(FSMC_BCR_MBKEN_BIT)
+#define FSMC_BCR_MUXEN                  (1U << FSMC_BCR_MUXEN_BIT)
+#define FSMC_BCR_MBKEN                  (1U << FSMC_BCR_MBKEN_BIT)
 
 /* SRAM/NOR-Flash chip-select timing registers */
 
@@ -195,15 +198,15 @@ typedef struct fsmc_nor_psram_reg_map {
 #define FSMC_PCR_ECCPS_8192B             (0x5 << 17)
 #define FSMC_PCR_TAR                     (0xF << 13)
 #define FSMC_PCR_TCLR                    (0xF << 9)
-#define FSMC_PCR_ECCEN                   BIT(FSMC_PCR_ECCEN_BIT)
+#define FSMC_PCR_ECCEN                   (1U << FSMC_PCR_ECCEN_BIT)
 #define FSMC_PCR_PWID                    (0x3 << 4)
 #define FSMC_PCR_PWID_8BITS              (0x0 << 4)
 #define FSMC_PCR_PWID_16BITS             (0x1 << 4)
-#define FSMC_PCR_PTYP                    BIT(FSMC_PCR_PTYP_BIT)
+#define FSMC_PCR_PTYP                    (1U << FSMC_PCR_PTYP_BIT)
 #define FSMC_PCR_PTYP_PC_CF_PCMCIA       (0x0 << FSMC_PCR_PTYP_BIT)
 #define FSMC_PCR_PTYP_NAND               (0x1 << FSMC_PCR_PTYP_BIT)
-#define FSMC_PCR_PBKEN                   BIT(FSMC_PCR_PBKEN_BIT)
-#define FSMC_PCR_PWAITEN                 BIT(FSMC_PCR_PWAITEN_BIT)
+#define FSMC_PCR_PBKEN                   (1U << FSMC_PCR_PBKEN_BIT)
+#define FSMC_PCR_PWAITEN                 (1U << FSMC_PCR_PWAITEN_BIT)
 
 /* FIFO status and interrupt registers */
 
@@ -215,13 +218,13 @@ typedef struct fsmc_nor_psram_reg_map {
 #define FSMC_SR_ILS_BIT                  1
 #define FSMC_SR_IRS_BIT                  0
 
-#define FSMC_SR_FEMPT                    BIT(FSMC_SR_FEMPT_BIT)
-#define FSMC_SR_IFEN                     BIT(FSMC_SR_IFEN_BIT)
-#define FSMC_SR_ILEN                     BIT(FSMC_SR_ILEN_BIT)
-#define FSMC_SR_IREN                     BIT(FSMC_SR_IREN_BIT)
-#define FSMC_SR_IFS                      BIT(FSMC_SR_IFS_BIT)
-#define FSMC_SR_ILS                      BIT(FSMC_SR_ILS_BIT)
-#define FSMC_SR_IRS                      BIT(FSMC_SR_IRS_BIT)
+#define FSMC_SR_FEMPT                    (1U << FSMC_SR_FEMPT_BIT)
+#define FSMC_SR_IFEN                     (1U << FSMC_SR_IFEN_BIT)
+#define FSMC_SR_ILEN                     (1U << FSMC_SR_ILEN_BIT)
+#define FSMC_SR_IREN                     (1U << FSMC_SR_IREN_BIT)
+#define FSMC_SR_IFS                      (1U << FSMC_SR_IFS_BIT)
+#define FSMC_SR_ILS                      (1U << FSMC_SR_ILS_BIT)
+#define FSMC_SR_IRS                      (1U << FSMC_SR_IRS_BIT)
 
 /* Common memory space timing registers */
 
@@ -248,35 +251,58 @@ typedef struct fsmc_nor_psram_reg_map {
  * Memory bank boundary addresses
  */
 
-/** Pointer to base address of FSMC memory bank 1 (split into 4
- * regions, each supporting 1 NOR Flash, SRAM, or PSRAM chip)  */
+/**
+ * @brief Void pointer to base address of FSMC memory bank 1 (NOR/PSRAM).
+ *
+ * This bank is split into 4 regions. Each region supports interfacing
+ * with 1 NOR Flash, SRAM, or PSRAM chip. The base addresses of these
+ * regions are FSMC_NOR_PSRAM_REGIONx, for x = 1, 2, 3, 4.
+ */
 #define FSMC_BANK1                      ((void*)0x60000000)
 
-/** Pointer to base address of FSMC memory bank 1, region 1 (for NOR/PSRAM) */
+/**
+ * @brief Void pointer to base address of FSMC memory bank 1, region 1
+ *        (NOR/PSRAM).
+ */
 #define FSMC_NOR_PSRAM_REGION1          FSMC_BANK1
 
-/** Pointer to base address of FSMC memory bank 1, region 2 (for NOR/PSRAM) */
+/**
+ * @brief Void pointer to base address of FSMC memory bank 1, region 2
+ *        (NOR/PSRAM).
+ */
 #define FSMC_NOR_PSRAM_REGION2          ((void*)0x64000000)
 
-/** Pointer to base address of FSMC memory bank 1, region 3 (for NOR/PSRAM) */
+/**
+ * @brief Void pointer to base address of FSMC memory bank 1, region 3
+ *        (NOR/PSRAM).
+ */
 #define FSMC_NOR_PSRAM_REGION3          ((void*)0x68000000)
 
-/** Pointer to base address of FSMC memory bank 1, region 4 (for NOR/PSRAM) */
+/**
+ * @brief Void pointer to base address of FSMC memory bank 1, region 4
+ *        (NOR/PSRAM).
+ */
 #define FSMC_NOR_PSRAM_REGION4          ((void*)0x6C000000)
 
-/** Pointer to base address of FSMC memory bank 2 (for NAND Flash) */
+/** Void pointer to base address of FSMC memory bank 2 (NAND Flash). */
 #define FSMC_BANK2                      ((void*)0x70000000)
 
-/** Pointer to base address of FSMC memory bank 3 (for NAND Flash) */
+/** Void pointer to base address of FSMC memory bank 3 (NAND Flash). */
 #define FSMC_BANK3                      ((void*)0x80000000)
 
-/** Pointer to base address of FSMC memory bank 4 (for PC card devices */
+/**
+ * @brief Void pointer to base address of FSMC memory bank 4 (PC card
+ *        devices).
+ */
 #define FSMC_BANK4                      ((void*)0x90000000)
 
 /*
  * SRAM/NOR Flash routines
  */
 
+/**
+ * @brief Configure FSMC GPIOs for use with SRAM.
+ */
 void fsmc_sram_init_gpios(void);
 
 /**
@@ -306,8 +332,6 @@ static inline void fsmc_nor_psram_set_addset(fsmc_nor_psram_reg_map *regs,
     regs->BTR &= ~FSMC_BTR_ADDSET;
     regs->BTR |= addset & 0xF;
 }
-
-#endif /* STM32_HIGH_DENSITY */
 
 #ifdef __cplusplus
 } /* extern "C" */

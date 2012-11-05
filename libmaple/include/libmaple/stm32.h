@@ -1,7 +1,7 @@
 /******************************************************************************
  * The MIT License
  *
- * Copyright (c) 2010 LeafLabs, LLC.
+ * Copyright (c) 2010, 2011, 2012 LeafLabs, LLC.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,8 +25,14 @@
  *****************************************************************************/
 
 /**
- * @file stm32.h
- * @brief STM32 chip-specific definitions
+ * @file libmaple/include/libmaple/stm32.h
+ * @brief STM32 chip header
+ *
+ * This header supplies various chip-specific values for the current
+ * build target. It's useful both to abstract away hardware details
+ * (e.g. through use of STM32_NR_INTERRUPTS) and to decide what to do
+ * when you want something nonportable (e.g. by checking
+ * STM32_MCU_SERIES).
  */
 
 #ifndef _LIBMAPLE_STM32_H_
@@ -36,24 +42,66 @@
 extern "C" {
 #endif
 
-/**
- * @brief STM32 series identifiers.
+/*
+ * STM32 series identifiers.
+ *
+ * Don't make these into an enum; the preprocessor needs them.
  */
-typedef enum stm32_series {
-    STM32_SERIES_F1, /**< F1 series */
-    STM32_SERIES_F2, /**< F2 series */
-    STM32_SERIES_L1, /**< L1 series */
-    STM32_SERIES_F4, /**< F4 series */
-} stm32_series;
+
+/** STM32F1 series. */
+#define STM32_SERIES_F1 0
+/** STM32F2 series. */
+#define STM32_SERIES_F2 1
+/** STM32L1 series. */
+#define STM32_SERIES_L1 2
+/** STM32F4 series. */
+#define STM32_SERIES_F4 3
 
 /* The series header is responsible for defining:
  *
- * - Everything enclosed in the following __DOXYGEN_PREDEFINED_HACK
- *   conditional block.
+ * - Everything in the following __DOXYGEN__ conditional block.
+ *
+ * - STM32_HAVE_FSMC: 1 if the MCU has the FSMC peripheral, and 0
+ *   otherwise.
+ *
+ * - STM32_HAVE_USB: 1 if the MCU has a USB peripheral, and 0
+ *   otherwise.
  */
 #include <series/stm32.h>
 
-#ifdef __DOXYGEN_PREDEFINED_HACK
+/* Ensure the series header isn't broken. */
+#if (!defined(STM32_PCLK1)         ||     \
+     !defined(STM32_PCLK2)         ||     \
+     !defined(STM32_MCU_SERIES)    ||     \
+     !defined(STM32_NR_INTERRUPTS) ||     \
+     !defined(STM32_NR_GPIO_PORTS) ||     \
+     !defined(STM32_TIMER_MASK)    ||     \
+     !defined(STM32_DELAY_US_MULT) ||     \
+     !defined(STM32_SRAM_END)      ||     \
+     !defined(STM32_HAVE_DAC)      ||     \
+     !defined(STM32_HAVE_FSMC)     ||     \
+     !defined(STM32_HAVE_USB))
+#error "Bad STM32F1 configuration. Check <series/stm32.h> header for your MCU."
+#endif
+
+/*
+ * Derived macros
+ */
+
+/* FIXME [0.0.13] add this to ReST API page */
+/**
+ * @brief Statically determine whether a timer is present.
+ *
+ * Given a constant timer number n (starting from 1), this macro has a
+ * nonzero value exactly when TIMERn is available.
+ */
+#define STM32_HAVE_TIMER(n) (STM32_TIMER_MASK & (1 << (n)))
+
+/*
+ * Doxygen for functionality provided by series header.
+ */
+
+#ifdef __DOXYGEN__
 
 /*
  * Clock configuration.
@@ -83,7 +131,11 @@ typedef enum stm32_series {
  */
 
 /**
- * @brief enum stm32_series value for the MCU being targeted.
+ * @brief STM32 series value for the MCU being targeted.
+ *
+ * At time of writing, allowed values are: STM32_SERIES_F1,
+ * STM32_SERIES_F2. This set of values will expand as libmaple adds
+ * support for more STM32 series MCUs.
  */
 #define STM32_MCU_SERIES
 
@@ -98,6 +150,19 @@ typedef enum stm32_series {
  * Number of GPIO ports.
  */
 #define STM32_NR_GPIO_PORTS
+
+/* FIXME [0.0.13] add this to ReST API page */
+/**
+ * @brief Bitmask of timers available on the MCU.
+ *
+ * That is, if TIMERn is available, then STM32_TIMER_MASK & (1 << n)
+ * will be nonzero. For example, a nonzero value of "STM32_TIMER_MASK
+ * & 0x2" means TIMER1 is available.
+ *
+ * A bitmask is necessary as some STM32 MCUs have "holes" in the range
+ * of available timers.
+ */
+#define STM32_TIMER_MASK
 
 /**
  * @brief Multiplier to convert microseconds into loop iterations
@@ -115,7 +180,29 @@ typedef enum stm32_series {
  */
 #define STM32_SRAM_END
 
-#endif  /* __DOXYGEN_PREDEFINED_HACK */
+/**
+ * @brief 1 if the target MCU has a DAC, and 0 otherwise.
+ */
+#define STM32_HAVE_DAC
+
+/**
+ * @brief 1 if the target MCU has the FSMC peripheral, and 0 otherwise.
+ *
+ * Note that the feature set of the FSMC peripheral is restricted on
+ * some MCUs.
+ */
+#define STM32_HAVE_FSMC
+
+/**
+ * @brief 1 if the target MCU has a USB peripheral, and 0 otherwise.
+ *
+ * Note that a variety of USB peripherals are available across the
+ * different series, with widely varying feature sets and programming
+ * interfaces. This macro will be 1 if any such peripheral is present.
+ */
+#define STM32_HAVE_USB
+
+#endif  /* __DOXYGEN__ */
 
 /*
  * The following are for backwards compatibility only.

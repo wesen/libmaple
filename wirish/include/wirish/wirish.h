@@ -42,7 +42,7 @@
 #include <wirish/wirish_debug.h>
 #include <wirish/wirish_math.h>
 #include <wirish/wirish_time.h>
-#include <wirish/HardwareSPI.h>
+/* FIXME put this back when you can #include <wirish/HardwareSPI.h> */
 #include <wirish/HardwareSerial.h>
 #include <wirish/HardwareTimer.h>
 #include <wirish/usb_serial.h>

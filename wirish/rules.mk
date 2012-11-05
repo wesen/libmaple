@@ -4,41 +4,44 @@ dirstack_$(sp)  := $(d)
 d               := $(dir)
 BUILDDIRS       += $(BUILD_PATH)/$(d)
 
-WIRISH_INCLUDES := -I$(d)/include
-
-# Board config -- TODO allow user override
-ifeq ($(WIRISH_BOARD_PATH),)
+# Add board directory and MCU-specific directory to BUILDDIRS. These
+# are in subdirectories, but they're logically part of the Wirish
+# submodule.
 WIRISH_BOARD_PATH := boards/$(BOARD)
 BUILDDIRS += $(BUILD_PATH)/$(d)/$(WIRISH_BOARD_PATH)
-WIRISH_INCLUDES += -I$(d)/$(WIRISH_BOARD_PATH)/include
-else
-BUILDDIRS += $(WIRISH_BOARD_PATH)
-WIRISH_INCLUDES += -I$(WIRISH_BOARD_PATH)/include
-endif
+BUILDDIRS += $(BUILD_PATH)/$(d)/$(MCU_SERIES)
 
-cppSRCS_$(d) += $(WIRISH_BOARD_PATH)/board.cpp
+# Safe includes for Wirish.
+WIRISH_INCLUDES := -I$(d)/include -I$(d)/$(WIRISH_BOARD_PATH)/include
 
-# Local flags
-CFLAGS_$(d) := $(WIRISH_INCLUDES) $(LIBMAPLE_INCLUDES)
+# Local flags. Add -I$(d) to allow for private includes.
+CFLAGS_$(d) := $(LIBMAPLE_INCLUDES) $(WIRISH_INCLUDES) -I$(d)
 
 # Local rules and targets
-
 sSRCS_$(d) := start.S
 cSRCS_$(d) := start_c.c
-cppSRCS_$(d) := wirish_math.cpp		 \
-                Print.cpp		 \
-		boards.cpp               \
-                HardwareSerial.cpp	 \
-                HardwareSPI.cpp		 \
-		HardwareTimer.cpp	 \
-                usb_serial.cpp		 \
-                cxxabi-compat.cpp	 \
-		wirish_shift.cpp	 \
-		wirish_analog.cpp	 \
-		wirish_time.cpp		 \
-		pwm.cpp 		 \
-		ext_interrupts.cpp	 \
-		wirish_digital.cpp
+cSRCS_$(d) += syscalls.c
+cppSRCS_$(d) := boards.cpp
+cppSRCS_$(d) += cxxabi-compat.cpp
+cppSRCS_$(d) += ext_interrupts.cpp
+cppSRCS_$(d) += HardwareSerial.cpp
+cppSRCS_$(d) += HardwareTimer.cpp
+cppSRCS_$(d) += Print.cpp
+cppSRCS_$(d) += pwm.cpp
+ifeq ($(MCU_SERIES), stm32f1)
+cppSRCS_$(d) += usb_serial.cpp	# HACK: this is currently STM32F1 only.
+endif
+cppSRCS_$(d) += wirish_analog.cpp
+cppSRCS_$(d) +=	wirish_digital.cpp
+cppSRCS_$(d) +=	wirish_math.cpp
+cppSRCS_$(d) +=	wirish_shift.cpp
+cppSRCS_$(d) +=	wirish_time.cpp
+cppSRCS_$(d) += $(MCU_SERIES)/boards_setup.cpp
+cppSRCS_$(d) += $(MCU_SERIES)/wirish_digital.cpp
+cppSRCS_$(d) += $(MCU_SERIES)/wirish_debug.cpp
+cppSRCS_$(d) += $(WIRISH_BOARD_PATH)/board.cpp
+# TODO: revise these appropriately for F2 and put them back in:
+# HardwareSPI.cpp
 
 sFILES_$(d)   := $(sSRCS_$(d):%=$(d)/%)
 cFILES_$(d)   := $(cSRCS_$(d):%=$(d)/%)

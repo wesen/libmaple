@@ -25,7 +25,7 @@
  *****************************************************************************/
 
 /**
- * @file libmaple/stm32f1/nvic.h
+ * @file libmaple/stm32f1/include/series/nvic.h
  * @brief STM32F1 Nested Vectored Interrupt Controller (NVIC) support.
  */
 
@@ -37,9 +37,10 @@ extern "C"{
 #endif
 
 #include <libmaple/libmaple_types.h>
+#include <libmaple/stm32.h>
 
 /**
- * @brief Interrupt vector table interrupt numbers.
+ * @brief STM32F1 interrupt vector table interrupt numbers.
  * @see <libmaple/scb.h>
  */
 typedef enum nvic_irq_num {
@@ -78,9 +79,11 @@ typedef enum nvic_irq_num {
     NVIC_CAN_RX1        = 21,   /**< CAN RX1 */
     NVIC_CAN_SCE        = 22,   /**< CAN SCE */
     NVIC_EXTI_9_5       = 23,   /**< EXTI line [9:5] */
-    NVIC_TIMER1_BRK     = 24,   /**< Timer 1 break */
-    NVIC_TIMER1_UP      = 25,   /**< Timer 1 update */
-    NVIC_TIMER1_TRG_COM = 26,   /**< Timer 1 trigger and commutation */
+    NVIC_TIMER1_BRK_TIMER9 = 24, /**< Timer 1 break, Timer 9. */
+    NVIC_TIMER1_UP_TIMER10 = 25, /**< Timer 1 update, Timer 10. */
+    NVIC_TIMER1_TRG_COM_TIMER11 = 26, /**<
+                                       * Timer 1 trigger and commutation,
+                                       * Timer 11. */
     NVIC_TIMER1_CC      = 27,   /**< Timer 1 capture/compare */
     NVIC_TIMER2         = 28,   /**< Timer 2 */
     NVIC_TIMER3         = 29,   /**< Timer 3 */
@@ -98,11 +101,12 @@ typedef enum nvic_irq_num {
     NVIC_RTCALARM       = 41,   /**< RTC alarm through EXTI line */
     NVIC_USBWAKEUP      = 42,   /**< USB wakeup from suspend through
                                      EXTI line */
-    NVIC_TIMER8_BRK     = 43,   /**< Timer 8 break */
-    NVIC_TIMER8_UP      = 44,   /**< Timer 8 update */
-    NVIC_TIMER8_TRG_COM = 45,   /**< Timer 8 trigger and commutation */
+    NVIC_TIMER8_BRK_TIMER12 = 43, /**< Timer 8 break, timer 12  */
+    NVIC_TIMER8_UP_TIMER13 = 44, /**< Timer 8 update, timer 13 */
+    NVIC_TIMER8_TRG_COM_TIMER14 = 45, /**<
+                                       * Timer 8 trigger and commutation,
+                                       * Timer 14. */
     NVIC_TIMER8_CC      = 46,   /**< Timer 8 capture/compare */
-#ifdef STM32_HIGH_DENSITY
     NVIC_ADC3           = 47,   /**< ADC3 */
     NVIC_FSMC           = 48,   /**< FSMC */
     NVIC_SDIO           = 49,   /**< SDIO */
@@ -116,20 +120,50 @@ typedef enum nvic_irq_num {
     NVIC_DMA2_CH2       = 57,   /**< DMA2 channel 2 */
     NVIC_DMA2_CH3       = 58,   /**< DMA2 channel 3 */
     NVIC_DMA2_CH_4_5    = 59,   /**< DMA2 channels 4 and 5 */
-#endif
+
+    /* Old enumerators kept around for backwards compatibility: */
+    NVIC_TIMER1_BRK =
+        NVIC_TIMER1_BRK_TIMER9, /**< @brief (Deprecated) Timer 1 break
+                                  *
+                                  * For backwards compatibility only.
+                                  * Use NVIC_TIMER1_BRK_TIMER9 instead. */
+    NVIC_TIMER1_UP =
+        NVIC_TIMER1_UP_TIMER10, /**< @brief (Deprecated) Timer 1 update.
+                                  *
+                                  * For backwards compatibility only.
+                                  * Use NVIC_TIMER1_UP_TIMER10 instead. */
+    NVIC_TIMER1_TRG_COM =
+        NVIC_TIMER1_TRG_COM_TIMER11, /**< @brief (deprecated) Timer 1 trigger
+                                      *          and commutation.
+                                      *
+                                      * For backwards compatibility only.
+                                      * Use NVIC_TIMER1_TRG_COM_TIMER11
+                                      * instead. */
+    NVIC_TIMER8_BRK =
+        NVIC_TIMER8_BRK_TIMER12, /**< @brief (deprecated) Timer 8 break
+                                  *
+                                  * For backwards compatibility only.
+                                  * Use NVIC_TIMER8_BRK_TIMER12 instead. */
+    NVIC_TIMER8_UP =
+        NVIC_TIMER8_UP_TIMER13, /**< @brief (deprecated) Timer 8 update
+                                  * For backwards compatibility only.
+                                  * Use NVIC_TIMER8_UP_TIMER13 instead. */
+    NVIC_TIMER8_TRG_COM =
+        NVIC_TIMER8_TRG_COM_TIMER14, /**< @brief (deprecated) Timer 8 trigger
+                                      *          and commutation.
+                                      * For backwards compatibility only.
+                                      * Use NVIC_TIMER8_TRG_COM_TIMER14
+                                      * instead. */
 } nvic_irq_num;
 
 static inline void nvic_irq_disable_all(void) {
-    /* Note: This only works up to XL density.  The fix for
-     * connectivity line is:
-     *
-     *     NVIC_BASE->ICER[2] = 0xF;
-     *
-     * We don't support connectivity line devices (yet), so leave it
-     * alone for now.
-     */
+    /* Even low-density devices have over 32 interrupt lines. */
     NVIC_BASE->ICER[0] = 0xFFFFFFFF;
     NVIC_BASE->ICER[1] = 0xFFFFFFFF;
+#if STM32_NR_INTERRUPTS > 64
+    /* Only some have over 64; e.g. connectivity line MCUs. */
+    NVIC_BASE->ICER[2] = 0xFFFFFFFF;
+#endif
 }
 
 #ifdef __cplusplus

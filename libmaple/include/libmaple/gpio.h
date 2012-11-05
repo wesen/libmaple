@@ -2,6 +2,7 @@
  * The MIT License
  *
  * Copyright (c) 2010 Perry Hung.
+ * Copyright (c) 2011, 2012 LeafLabs, LLC.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,7 +26,7 @@
 *****************************************************************************/
 
 /**
- * @file gpio.h
+ * @file libmaple/include/libmaple/gpio.h
  * @brief General Purpose I/O (GPIO) interace.
  */
 
@@ -38,20 +39,44 @@ extern "C"{
 
 /*
  * Note: Series header must define:
- * - struct gpio_dev (and declare extern pointers to series-provided ones)
- * - enum gpio_pin_mode (TODO think hard on this)
+ * - enum gpio_pin_mode (TODO think harder about portability here)
  */
 #include <series/gpio.h>
-#include <libmaple/libmaple.h>
+#include <libmaple/libmaple_types.h>
+#include <libmaple/rcc.h>
+#include <libmaple/exti.h>
 
 /*
- * GPIO Convenience routines
+ * Device type
+ */
+
+/** GPIO device type */
+typedef struct gpio_dev {
+    gpio_reg_map *regs;         /**< Register map */
+    rcc_clk_id    clk_id;       /**< RCC clock information */
+    /**
+     * @brief (Deprecated) External interrupt port.
+     * Instead of dev->exti_port, use gpio_exti_port(dev).
+     */
+    exti_cfg      exti_port;
+} gpio_dev;
+
+/*
+ * Portable routines
  */
 
 void gpio_init(gpio_dev *dev);
 void gpio_init_all(void);
-/* TODO deprecate this? We should probably take a flags argument. */
+/* TODO flags argument version? */
 void gpio_set_mode(gpio_dev *dev, uint8 pin, gpio_pin_mode mode);
+
+/**
+ * @brief Get a GPIO port's corresponding EXTI port configuration.
+ * @param dev GPIO port whose exti_cfg to return.
+ */
+static inline exti_cfg gpio_exti_port(gpio_dev *dev) {
+    return (exti_cfg)(EXTI_PA + (dev->clk_id - RCC_GPIOA));
+}
 
 /**
  * Set or reset a GPIO pin.
@@ -63,11 +88,8 @@ void gpio_set_mode(gpio_dev *dev, uint8 pin, gpio_pin_mode mode);
  * @param val If true, set the pin.  If false, reset the pin.
  */
 static inline void gpio_write_bit(gpio_dev *dev, uint8 pin, uint8 val) {
-    if (val) {
-        dev->regs->BSRR = BIT(pin);
-    } else {
-        dev->regs->BRR = BIT(pin);
-    }
+    val = !val;          /* "set" bits are lower than "reset" bits  */
+    dev->regs->BSRR = (1U << pin) << (16 * val);
 }
 
 /**
@@ -80,7 +102,7 @@ static inline void gpio_write_bit(gpio_dev *dev, uint8 pin, uint8 val) {
  * @return True if the pin is set, false otherwise.
  */
 static inline uint32 gpio_read_bit(gpio_dev *dev, uint8 pin) {
-    return dev->regs->IDR & BIT(pin);
+    return dev->regs->IDR & (1U << pin);
 }
 
 /**
@@ -89,7 +111,7 @@ static inline uint32 gpio_read_bit(gpio_dev *dev, uint8 pin) {
  * @param pin Pin on dev to toggle.
  */
 static inline void gpio_toggle_bit(gpio_dev *dev, uint8 pin) {
-    dev->regs->ODR = dev->regs->ODR ^ BIT(pin);
+    dev->regs->ODR = dev->regs->ODR ^ (1U << pin);
 }
 
 #ifdef __cplusplus

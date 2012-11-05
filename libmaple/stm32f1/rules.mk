@@ -7,13 +7,23 @@ BUILDDIRS       += $(BUILD_PATH)/$(d)
 # Local flags
 CFLAGS_$(d) = -I$(d) $(LIBMAPLE_PRIVATE_INCLUDES) $(LIBMAPLE_INCLUDES) -Wall -Werror
 
-# Local rules and targets
-sSRCS_$(d) := isrs_performance.S            \
-              vector_table_performance.S
+# Extra BUILDDIRS
+BUILDDIRS += $(BUILD_PATH)/$(d)/$(MCU_F1_LINE)
 
-cSRCS_$(d) := rcc.c
-cSRCS_$(d) += flash.c
+# Local rules and targets
+sSRCS_$(d) := $(MCU_F1_LINE)/isrs.S
+sSRCS_$(d) += $(MCU_F1_LINE)/vector_table.S
+
+cSRCS_$(d) := adc.c
+cSRCS_$(d) += bkp.c
+cSRCS_$(d) += dma.c
+cSRCS_$(d) += exti.c
+cSRCS_$(d) += fsmc.c
 cSRCS_$(d) += gpio.c
+cSRCS_$(d) += rcc.c
+cSRCS_$(d) += spi.c
+cSRCS_$(d) += timer.c
+cSRCS_$(d) += usart.c
 
 sFILES_$(d) := $(sSRCS_$(d):%=$(d)/%)
 cFILES_$(d) := $(cSRCS_$(d):%=$(d)/%)

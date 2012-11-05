@@ -11,25 +11,26 @@ LIBMAPLE_PRIVATE_INCLUDES := -I$(LIBMAPLE_PATH)
 CFLAGS_$(d) = $(LIBMAPLE_PRIVATE_INCLUDES) $(LIBMAPLE_INCLUDES) -Wall -Werror
 
 # Local rules and targets
-cSRCS_$(d) := adc.c                    \
-              bkp.c                    \
-              dac.c                    \
-              dma.c                    \
-              exti.c                   \
-              flash.c                  \
-              fsmc.c                   \
-              gpio.c                   \
-              iwdg.c                   \
-              nvic.c                   \
-              pwr.c		       \
-              i2c.c                    \
-              rcc.c                    \
-              spi.c                    \
-              syscalls.c               \
-              systick.c                \
-              timer.c                  \
-              usart.c                  \
-              util.c
+cSRCS_$(d) := adc.c
+cSRCS_$(d) += dac.c
+ifeq ($(MCU_SERIES),stm32f1)	# FIXME add F2 support
+cSRCS_$(d) += dma.c
+endif
+cSRCS_$(d) += exti.c
+cSRCS_$(d) += flash.c
+cSRCS_$(d) += gpio.c
+cSRCS_$(d) += iwdg.c
+cSRCS_$(d) += nvic.c
+cSRCS_$(d) += pwr.c
+cSRCS_$(d) += rcc.c
+cSRCS_$(d) += spi.c
+cSRCS_$(d) += systick.c
+cSRCS_$(d) += timer.c
+cSRCS_$(d) += usart.c
+cSRCS_$(d) += usart_private.c
+cSRCS_$(d) += util.c
+# These still need to be brought back for F1:
+# cSRCS_$(d) += i2c.c
 
 sSRCS_$(d) := exc.S
 

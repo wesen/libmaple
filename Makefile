@@ -19,10 +19,7 @@ SUPPORT_PATH := $(SRCROOT)/support
 LDDIR := $(SUPPORT_PATH)/ld
 # Support files for this Makefile
 MAKEDIR := $(SUPPORT_PATH)/make
-
-# USB ID for DFU upload
-VENDOR_ID  := 1EAF
-PRODUCT_ID := 0003
+BOARD_INCLUDE_DIR := $(MAKEDIR)/board-includes
 
 ##
 ## Target-specific configuration.  This determines some compiler and
@@ -54,8 +51,7 @@ GLOBAL_CFLAGS   := -Os -g3 -gdwarf-2  -mcpu=cortex-m3 -mthumb -march=armv7-m \
 GLOBAL_CXXFLAGS := -fno-rtti -fno-exceptions -Wall $(TARGET_FLAGS)
 GLOBAL_ASFLAGS  := -mcpu=cortex-m3 -march=armv7-m -mthumb		     \
 		   -x assembler-with-cpp $(TARGET_FLAGS)
-LDFLAGS  = -T$(LDDIR)/$(LDSCRIPT) -L$(LDDIR)    \
-            -mcpu=cortex-m3 -mthumb -Xlinker -L $(LD_SERIES_PATH)    \
+LDFLAGS  =  $(TARGET_LDFLAGS) -mcpu=cortex-m3 -mthumb -Xlinker \
             --gc-sections --print-gc-sections --march=armv7-m -Wall
 
 ##
@@ -75,16 +71,16 @@ ifeq ($(LIBMAPLE_MODULES),)
 else
 	LIBMAPLE_MODULES += $(SRCROOT)/libmaple
 endif
-LIBMAPLE_MODULES += $(SRCROOT)/libmaple/usb   # USB FS device
+LIBMAPLE_MODULES += $(SRCROOT)/libmaple/usb   # The USB module is kept separate
 LIBMAPLE_MODULES += $(LIBMAPLE_MODULE_SERIES) # STM32 series submodule in libmaple
 LIBMAPLE_MODULES += $(SRCROOT)/wirish
 # Official libraries:
-LIBMAPLE_MODULES += $(SRCROOT)/libraries/Servo
-LIBMAPLE_MODULES += $(SRCROOT)/libraries/LiquidCrystal
-LIBMAPLE_MODULES += $(SRCROOT)/libraries/Wire
+# LIBMAPLE_MODULES += $(SRCROOT)/libraries/Servo
+# LIBMAPLE_MODULES += $(SRCROOT)/libraries/LiquidCrystal
+# LIBMAPLE_MODULES += $(SRCROOT)/libraries/Wire
 
 # Experimental libraries:
-LIBMAPLE_MODULES += $(SRCROOT)/libraries/FreeRTOS
+# LIBMAPLE_MODULES += $(SRCROOT)/libraries/FreeRTOS
 
 # Call each module's rules.mk:
 $(foreach m,$(LIBMAPLE_MODULES),$(eval $(call LIBMAPLE_MODULE_template,$(m))))
@@ -96,16 +92,18 @@ $(foreach m,$(LIBMAPLE_MODULES),$(eval $(call LIBMAPLE_MODULE_template,$(m))))
 # main target
 include $(SRCROOT)/build-targets.mk
 
-.PHONY: install sketch clean help debug cscope tags ctags ram flash jtag doxygen mrproper
+.PHONY: install sketch clean help cscope tags ctags ram flash jtag doxygen mrproper list-boards
 
 # Target upload commands
+# USB ID for DFU upload -- FIXME: do something smarter with this
+BOARD_USB_VENDOR_ID  := 1EAF
+BOARD_USB_PRODUCT_ID := 0003
 UPLOAD_ram   := $(SUPPORT_PATH)/scripts/reset.py && \
                 sleep 1                  && \
-                $(DFU) -a0 -d $(VENDOR_ID):$(PRODUCT_ID) -D $(BUILD_PATH)/$(BOARD).bin -R
+                $(DFU) -a0 -d $(BOARD_USB_VENDOR_ID):$(BOARD_USB_PRODUCT_ID) -D $(BUILD_PATH)/$(BOARD).bin -R
 UPLOAD_flash := $(SUPPORT_PATH)/scripts/reset.py && \
                 sleep 1                  && \
-                $(DFU) -a1 -d $(VENDOR_ID):$(PRODUCT_ID) -D $(BUILD_PATH)/$(BOARD).bin -R
-UPLOAD_jtag  := $(OPENOCD_WRAPPER) flash
+                $(DFU) -a1 -d $(BOARD_USB_VENDOR_ID):$(BOARD_USB_PRODUCT_ID) -D $(BUILD_PATH)/$(BOARD).bin -R
 
 # Conditionally upload to whatever the last build was
 install: INSTALL_TARGET = $(shell cat $(BUILD_PATH)/build-type 2>/dev/null)
@@ -130,38 +128,37 @@ mrproper: clean
 
 help:
 	@echo ""
-	@echo "  libmaple Makefile help"
-	@echo "  ----------------------"
-	@echo "  "
-	@echo "  Programming targets:"
-	@echo "      sketch:   Compile for BOARD to MEMORY_TARGET (default)."
-	@echo "      install:  Compile and upload code over USB, using Maple bootloader"
-	@echo "  "
-	@echo "  You *must* set BOARD if not compiling for Maple (e.g."
-	@echo "  use BOARD=maple_mini for mini, etc.), and MEMORY_TARGET"
-	@echo "  if not compiling to Flash."
-	@echo "  "
-	@echo "  Valid BOARDs:"
-	@echo "      maple, maple_mini, maple_RET6, maple_native"
-	@echo "  "
-	@echo "  Valid MEMORY_TARGETs (default=flash):"
-	@echo "      ram:    Compile sketch code to ram"
-	@echo "      flash:  Compile sketch code to flash"
-	@echo "      jtag:   Compile sketch code for jtag; overwrites bootloader"
-	@echo "  "
-	@echo "  Other targets:"
-	@echo "      debug:  Start OpenOCD gdb server on port 3333, telnet on port 4444"
-	@echo "      clean: Remove all build and object files"
-	@echo "      help: Show this message"
-	@echo "      doxygen: Build Doxygen HTML and XML documentation"
-	@echo "      mrproper: Remove all generated files"
-	@echo "  "
-
-debug:
-	$(OPENOCD_WRAPPER) debug
+	@echo "Basic usage (BOARD defaults to maple):"
+	@echo "    $$ cp your-main.cpp main.cpp"
+	@echo "    $$ make BOARD=your_board"
+	@echo "    $$ make BOARD=your_board install"
+	@echo ""
+	@echo "(Multiple source files? Link with libmaple.a (\`$$ make library')"
+	@echo "or hack build-targets.mk appropriately.)"
+	@echo ""
+	@echo "Important targets:"
+	@echo "    sketch:   Compile for BOARD to MEMORY_TARGET (default)."
+	@echo "    install:  Compile and upload over USB using Maple bootloader"
+	@echo ""
+	@echo "You *must* set BOARD if not compiling for Maple (e.g."
+	@echo "use BOARD=maple_mini for mini, etc.), and MEMORY_TARGET"
+	@echo "if not compiling to Flash. Run \`$$ make list-boards' for"
+	@echo "a list of all boards."
+	@echo ""
+	@echo "Valid MEMORY_TARGETs (default=flash):"
+	@echo "    ram:    Compile to RAM (doesn't touch Flash)"
+	@echo "    flash:  Compile to Flash (for Maple bootloader)"
+	@echo "    jtag:   Compile for JTAG/SWD upload (overwrites bootloader)"
+	@echo ""
+	@echo "Other targets:"
+	@echo "    clean: Remove all build and object files"
+	@echo "    doxygen: Build Doxygen HTML and XML documentation"
+	@echo "    help: Show this message"
+	@echo "    mrproper: Remove all generated files"
+	@echo ""
 
 cscope:
-	rm -rf *.cscope
+	rm -rf cscope.*
 	find . -name '*.[hcS]' -o -name '*.cpp' | xargs cscope -b
 
 tags:
