@@ -9,4 +9,5 @@ TAGS
 *.swp
 arm
 cscope*
+.gdbinit
 docs

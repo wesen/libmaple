@@ -25,7 +25,8 @@ CFLAGS_$(d) := $(WIRISH_INCLUDES) $(LIBMAPLE_INCLUDES) -I$(d)
 sSRCS_$(d) := start.S
 cSRCS_$(d) := start_c.c
 cSRCS_$(d) += syscalls.c
-cppSRCS_$(d) := boards.cpp
+cSRCS_$(d) += $(MCU_SERIES)/util_hooks.c
+cppSRCS_$(d) += boards.cpp
 cppSRCS_$(d) += cxxabi-compat.cpp
 cppSRCS_$(d) += ext_interrupts.cpp
 cppSRCS_$(d) += HardwareSerial.cpp
@@ -34,6 +35,7 @@ cppSRCS_$(d) += Print.cpp
 cppSRCS_$(d) += pwm.cpp
 ifeq ($(MCU_SERIES), stm32f1)
 cppSRCS_$(d) += usb_serial.cpp	# HACK: this is currently STM32F1 only.
+cppSRCS_$(d) += HardwareSPI.cpp	# FIXME: port to F2 and fix wirish.h
 endif
 cppSRCS_$(d) += wirish_analog.cpp
 cppSRCS_$(d) +=	wirish_digital.cpp
@@ -43,9 +45,6 @@ cppSRCS_$(d) +=	wirish_time.cpp
 cppSRCS_$(d) += $(MCU_SERIES)/boards_setup.cpp
 cppSRCS_$(d) += $(MCU_SERIES)/wirish_digital.cpp
 cppSRCS_$(d) += $(MCU_SERIES)/wirish_debug.cpp
-# TODO: revise these appropriately for F2 and put them back in:
-# HardwareSPI.cpp
-cppSRCS_$(d) +=	HardwareSPI.cpp
 
 sFILES_$(d)   := $(sSRCS_$(d):%=$(d)/%)
 cFILES_$(d)   := $(cSRCS_$(d):%=$(d)/%)

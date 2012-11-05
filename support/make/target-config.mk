@@ -32,8 +32,10 @@ ifeq ($(MCU_SERIES), stm32f1)
 LD_SERIES_PATH := $(LD_SERIES_PATH)/$(MCU_F1_LINE)
 endif
 
-TARGET_LDFLAGS += -T$(LD_SCRIPT_PATH) -L $(LD_SERIES_PATH) \
-	          -L $(LD_MEM_PATH) -L$(LDDIR)
+TARGET_LDFLAGS += -Xlinker -T$(LD_SCRIPT_PATH) \
+                  -L $(LD_SERIES_PATH) \
+                  -L $(LD_MEM_PATH) \
+                  -L $(LDDIR)
 TARGET_FLAGS += -DBOARD_$(BOARD) -DMCU_$(MCU) \
                 -DERROR_LED_PORT=$(ERROR_LED_PORT) \
                 -DERROR_LED_PIN=$(ERROR_LED_PIN) \

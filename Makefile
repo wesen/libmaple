@@ -51,8 +51,10 @@ GLOBAL_CFLAGS   := -Os -g3 -gdwarf-2  -mcpu=cortex-m3 -mthumb -march=armv7-m \
 GLOBAL_CXXFLAGS := -fno-rtti -fno-exceptions -Wall $(TARGET_FLAGS)
 GLOBAL_ASFLAGS  := -mcpu=cortex-m3 -march=armv7-m -mthumb		     \
 		   -x assembler-with-cpp $(TARGET_FLAGS)
-LDFLAGS  =  $(TARGET_LDFLAGS) -mcpu=cortex-m3 -mthumb -Xlinker \
-            --gc-sections --print-gc-sections --march=armv7-m -Wall
+LDFLAGS  = $(TARGET_LDFLAGS) -mcpu=cortex-m3 -mthumb \
+           -Xlinker --gc-sections \
+           -Xassembler --march=armv7-m -Wall
+#          -Xlinker --print-gc-sections \
 
 ##
 ## Build rules and useful templates
@@ -65,22 +67,22 @@ include $(MAKEDIR)/build-templates.mk
 ## Set all submodules here
 ##
 
-# Try to keep LIBMAPLE_MODULES a simply-expanded variable
-ifeq ($(LIBMAPLE_MODULES),)
-	LIBMAPLE_MODULES := $(SRCROOT)/libmaple
-else
-	LIBMAPLE_MODULES += $(SRCROOT)/libmaple
-endif
+LIBMAPLE_MODULES += $(SRCROOT)/libmaple
 LIBMAPLE_MODULES += $(SRCROOT)/libmaple/usb   # The USB module is kept separate
 LIBMAPLE_MODULES += $(LIBMAPLE_MODULE_SERIES) # STM32 series submodule in libmaple
 LIBMAPLE_MODULES += $(SRCROOT)/wirish
-# Official libraries:
-# LIBMAPLE_MODULES += $(SRCROOT)/libraries/Servo
-# LIBMAPLE_MODULES += $(SRCROOT)/libraries/LiquidCrystal
-# LIBMAPLE_MODULES += $(SRCROOT)/libraries/Wire
 
+# Official libraries:
+LIBMAPLE_MODULES += $(SRCROOT)/libraries/Servo
+LIBMAPLE_MODULES += $(SRCROOT)/libraries/LiquidCrystal
+LIBMAPLE_MODULES += $(SRCROOT)/libraries/Wire
 # Experimental libraries:
-# LIBMAPLE_MODULES += $(SRCROOT)/libraries/FreeRTOS
+LIBMAPLE_MODULES += $(SRCROOT)/libraries/FreeRTOS
+
+# User modules:
+ifneq ($(USER_MODULES),)
+LIBMAPLE_MODULES += $(USER_MODULES)
+endif
 
 # Call each module's rules.mk:
 $(foreach m,$(LIBMAPLE_MODULES),$(eval $(call LIBMAPLE_MODULE_template,$(m))))
