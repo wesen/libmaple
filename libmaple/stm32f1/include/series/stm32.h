@@ -98,6 +98,12 @@ extern "C" {
 #   define STM32_SRAM_END               ((void*)0x20002000)
 #   define STM32_MEDIUM_DENSITY
 
+#elif defined(MCU_STM32F103RC)
+#   define STM32_F1_LINE                STM32_F1_LINE_PERFORMANCE
+#   define STM32_NR_GPIO_PORTS         3                    // PD is only osc
+#   define STM32_SRAM_END              ((void*)0x20010000)  // 64K
+#   define STM32_HIGH_DENSITY
+
 #else
 #warning "Unsupported or unspecified STM32F1 MCU."
 #endif

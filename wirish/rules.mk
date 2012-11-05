@@ -3,19 +3,23 @@ sp              := $(sp).x
 dirstack_$(sp)  := $(d)
 d               := $(dir)
 BUILDDIRS       += $(BUILD_PATH)/$(d)
-
-# Add board directory and MCU-specific directory to BUILDDIRS. These
-# are in subdirectories, but they're logically part of the Wirish
-# submodule.
-WIRISH_BOARD_PATH := boards/$(BOARD)
-BUILDDIRS += $(BUILD_PATH)/$(d)/$(WIRISH_BOARD_PATH)
 BUILDDIRS += $(BUILD_PATH)/$(d)/$(MCU_SERIES)
 
-# Safe includes for Wirish.
-WIRISH_INCLUDES := -I$(d)/include -I$(d)/$(WIRISH_BOARD_PATH)/include
+WIRISH_INCLUDES := -I$(d)/include
 
-# Local flags. Add -I$(d) to allow for private includes.
-CFLAGS_$(d) := $(LIBMAPLE_INCLUDES) $(WIRISH_INCLUDES) -I$(d)
+# Board config -- TODO allow user override
+ifeq ($(WIRISH_BOARD_PATH),)
+WIRISH_BOARD_PATH := boards/$(BOARD)
+BUILDDIRS += $(BUILD_PATH)/$(d)/$(WIRISH_BOARD_PATH)
+WIRISH_INCLUDES += -I$(d)/$(WIRISH_BOARD_PATH)/include
+cppSRCS_$(d) += $(WIRISH_BOARD_PATH)/board.cpp
+else
+BUILDDIRS += $(WIRISH_BOARD_PATH)
+WIRISH_INCLUDES += -I$(WIRISH_BOARD_PATH)/include
+endif
+
+# Local flags
+CFLAGS_$(d) := $(WIRISH_INCLUDES) $(LIBMAPLE_INCLUDES) -I$(d)
 
 # Local rules and targets
 sSRCS_$(d) := start.S
