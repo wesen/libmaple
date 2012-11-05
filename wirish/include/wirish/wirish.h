@@ -43,6 +43,7 @@
 #include <wirish/wirish_math.h>
 #include <wirish/wirish_time.h>
 /* FIXME put this back when you can #include <wirish/HardwareSPI.h> */
+#include <wirish/HardwareSPI.h>
 #include <wirish/HardwareSerial.h>
 #include <wirish/HardwareTimer.h>
 #include <wirish/usb_serial.h>
@@ -68,4 +69,3 @@
 #define bit(b)                         (1UL << (b))
 
 #endif
-

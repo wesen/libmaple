@@ -43,9 +43,9 @@ cppSRCS_$(d) +=	wirish_time.cpp
 cppSRCS_$(d) += $(MCU_SERIES)/boards_setup.cpp
 cppSRCS_$(d) += $(MCU_SERIES)/wirish_digital.cpp
 cppSRCS_$(d) += $(MCU_SERIES)/wirish_debug.cpp
-cppSRCS_$(d) += $(WIRISH_BOARD_PATH)/board.cpp
 # TODO: revise these appropriately for F2 and put them back in:
 # HardwareSPI.cpp
+cppSRCS_$(d) +=	HardwareSPI.cpp
 
 sFILES_$(d)   := $(sSRCS_$(d):%=$(d)/%)
 cFILES_$(d)   := $(cSRCS_$(d):%=$(d)/%)
