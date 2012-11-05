@@ -41,15 +41,6 @@ extern "C" {
 #include <libmaple/util.h>
 #include <libmaple/delay.h>
 
-/*
- * Where to put usercode, based on space reserved for bootloader.
- *
- * FIXME this has no business being here
- */
-#define USER_ADDR_ROM 0x08005000
-#define USER_ADDR_RAM 0x20000C00
-#define STACK_TOP     0x20000800
-
 #ifdef __cplusplus
 }
 #endif

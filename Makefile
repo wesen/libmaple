@@ -35,6 +35,13 @@ MEMORY_TARGET ?= flash
 include $(MAKEDIR)/target-config.mk
 
 ##
+## Build rules and useful templates
+##
+
+include $(MAKEDIR)/build-rules.mk
+include $(MAKEDIR)/build-templates.mk
+
+##
 ## Compilation flags
 ##
 
@@ -45,23 +52,15 @@ include $(MAKEDIR)/target-config.mk
 # It slows compilation noticeably; remove after 1 release.
 TARGET_FLAGS    += -I$(LIBMAPLE_PATH)/include/libmaple                       \
                    -I$(WIRISH_PATH)/include/wirish
-GLOBAL_CFLAGS   := -Os -g3 -gdwarf-2  -mcpu=cortex-m3 -mthumb -march=armv7-m \
-		   -nostdlib -ffunction-sections -fdata-sections	     \
+GLOBAL_CFLAGS   := -Os -g3 -gdwarf-2 -nostdlib \
+                   -ffunction-sections -fdata-sections \
 		   -Wl,--gc-sections $(TARGET_FLAGS)
 GLOBAL_CXXFLAGS := -fno-rtti -fno-exceptions -Wall $(TARGET_FLAGS)
-GLOBAL_ASFLAGS  := -mcpu=cortex-m3 -march=armv7-m -mthumb		     \
-		   -x assembler-with-cpp $(TARGET_FLAGS)
-LDFLAGS  = $(TARGET_LDFLAGS) -mcpu=cortex-m3 -mthumb \
+GLOBAL_ASFLAGS  := -x assembler-with-cpp $(TARGET_FLAGS)
+LDFLAGS  = $(TARGET_LDFLAGS) $(TOOLCHAIN_LDFLAGS) -mcpu=cortex-m3 -mthumb \
            -Xlinker --gc-sections \
            -Xassembler --march=armv7-m -Wall
 #          -Xlinker --print-gc-sections \
-
-##
-## Build rules and useful templates
-##
-
-include $(MAKEDIR)/build-rules.mk
-include $(MAKEDIR)/build-templates.mk
 
 ##
 ## Set all submodules here
