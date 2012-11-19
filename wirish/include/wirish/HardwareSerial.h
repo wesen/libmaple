@@ -64,8 +64,7 @@ public:
     uint32 available(void);
     uint8 read(void);
     void flush(void);
-    virtual void write(unsigned char);
-    using Print::write;
+    void write(unsigned char a);
 
     /* Pin accessors */
     int txPin(void) { return this->tx_pin; }
