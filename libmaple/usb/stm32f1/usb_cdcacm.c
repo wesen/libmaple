@@ -407,6 +407,11 @@ uint32 usb_cdcacm_tx(const uint8* buf, uint32 len) {
         usb_set_ep_tx_count(USB_CDCACM_TX_ENDP, len);
         n_unsent_bytes = len;
         usb_set_ep_tx_stat(USB_CDCACM_TX_ENDP, USB_EP_STAT_TX_VALID);
+    } else {
+      usb_set_ep_tx_count(USB_CDCACM_TX_ENDP, 0);
+      usb_set_ep_tx_stat(USB_CDCACM_TX_ENDP, USB_EP_STAT_TX_VALID);
+      // actually block here waiting for interrupt, even though we sent 0 bytes
+      n_unsent_bytes = 1;
     }
 
     return len;
