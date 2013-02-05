@@ -62,7 +62,7 @@ void bkp_init(void) {
  * @see bkp_init()
  */
 void bkp_enable_writes(void) {
-  *bb_perip(&PWR_BASE->CR, PWR_CR_DBP_BIT) = 1;
+    *bb_perip(&PWR_BASE->CR, PWR_CR_DBP_BIT) = 1;
 }
 
 /**

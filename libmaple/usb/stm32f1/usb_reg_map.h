@@ -88,7 +88,7 @@ typedef struct usb_reg_map {
 #define USB_EP_EP_TYPE_ISO             (0x2 << 9)
 #define USB_EP_EP_TYPE_INTERRUPT       (0x3 << 9)
 #define USB_EP_EP_KIND                 BIT(USB_EP_EP_KIND_BIT)
-#define USB_EP_EP_DBL_BUF              USB_EP_EP_KIND
+#define USB_EP_EP_KIND_DBL_BUF         (0x1 << USB_EP_EP_KIND_BIT)
 #define USB_EP_CTR_TX                  BIT(USB_EP_CTR_TX_BIT)
 #define USB_EP_DTOG_TX                 BIT(USB_EP_DTOG_TX_BIT)
 #define USB_EP_STAT_TX                 (0x3 << 4)
@@ -207,83 +207,83 @@ static inline void usb_clear_ctr_tx(uint8 ep) {
 }
 
 static inline uint32 usb_get_ep_dtog_tx(uint8 ep) {
-  uint32 epr = USB_BASE->EP[ep];
-  return epr & USB_EP_DTOG_TX;
+    uint32 epr = USB_BASE->EP[ep];
+    return epr & USB_EP_DTOG_TX;
 }
 
 static inline uint32 usb_get_ep_dtog_rx(uint8 ep) {
-  uint32 epr = USB_BASE->EP[ep];
-  return epr & USB_EP_DTOG_RX;
+    uint32 epr = USB_BASE->EP[ep];
+    return epr & USB_EP_DTOG_RX;
 }
 
 static inline uint32 usb_get_ep_tx_sw_buf(uint8 ep) {
-  return usb_get_ep_dtog_rx(ep);
+    return usb_get_ep_dtog_rx(ep);
 }
 
 static inline uint32 usb_get_ep_rx_sw_buf(uint8 ep) {
-  return usb_get_ep_dtog_tx(ep);
+    return usb_get_ep_dtog_tx(ep);
 }
 
 static inline void usb_toggle_ep_dtog_tx(uint8 ep) {
-  uint32 epr = USB_BASE->EP[ep];
-  epr &= __EP_NONTOGGLE;
-  epr |= USB_EP_DTOG_TX;
-  USB_BASE->EP[ep] = epr;
+    uint32 epr = USB_BASE->EP[ep];
+    epr &= __EP_NONTOGGLE;
+    epr |= USB_EP_DTOG_TX;
+    USB_BASE->EP[ep] = epr;
 }
 
 static inline void usb_toggle_ep_dtog_rx(uint8 ep) {
-  uint32 epr = USB_BASE->EP[ep];
-  epr &= __EP_NONTOGGLE;
-  epr |= USB_EP_DTOG_RX;
-  USB_BASE->EP[ep] = epr;
+    uint32 epr = USB_BASE->EP[ep];
+    epr &= __EP_NONTOGGLE;
+    epr |= USB_EP_DTOG_RX;
+    USB_BASE->EP[ep] = epr;
 }
 
 static inline void usb_clear_ep_dtog_tx(uint8 ep) {
-  if (usb_get_ep_dtog_tx(ep) != 0) {
-    usb_toggle_ep_dtog_tx(ep);
-  }
+    if (usb_get_ep_dtog_tx(ep) != 0) {
+        usb_toggle_ep_dtog_tx(ep);
+    }
 }
 
 static inline void usb_clear_ep_dtog_rx(uint8 ep) {
-  if (usb_get_ep_dtog_rx(ep) != 0) {
-    usb_toggle_ep_dtog_rx(ep);
-  }
+    if (usb_get_ep_dtog_rx(ep) != 0) {
+        usb_toggle_ep_dtog_rx(ep);
+    }
 }
 
 static inline void usb_set_ep_dtog_tx(uint8 ep) {
-  if (usb_get_ep_dtog_tx(ep) == 0) {
-    usb_toggle_ep_dtog_tx(ep);
-  }
+    if (usb_get_ep_dtog_tx(ep) == 0) {
+        usb_toggle_ep_dtog_tx(ep);
+    }
 }
 
 static inline void usb_set_ep_dtog_rx(uint8 ep) {
-  if (usb_get_ep_dtog_rx(ep) == 0) {
-    usb_toggle_ep_dtog_rx(ep);
-  }
+    if (usb_get_ep_dtog_rx(ep) == 0) {
+        usb_toggle_ep_dtog_rx(ep);
+    }
 }
 
 static inline void usb_toggle_ep_rx_sw_buf(uint8 ep) {
-  usb_toggle_ep_dtog_tx(ep);
+    usb_toggle_ep_dtog_tx(ep);
 }
 
 static inline void usb_toggle_ep_tx_sw_buf(uint8 ep) {
-  usb_toggle_ep_dtog_rx(ep);
+    usb_toggle_ep_dtog_rx(ep);
 }
 
 static inline void usb_clear_ep_rx_sw_buf(uint8 ep) {
-  usb_clear_ep_dtog_tx(ep);
+    usb_clear_ep_dtog_tx(ep);
 }
 
 static inline void usb_clear_ep_tx_sw_buf(uint8 ep) {
-  usb_clear_ep_dtog_rx(ep);
+    usb_clear_ep_dtog_rx(ep);
 }
 
 static inline void usb_set_ep_rx_sw_buf(uint8 ep) {
-  usb_set_ep_dtog_tx(ep);
+    usb_set_ep_dtog_tx(ep);
 }
 
 static inline void usb_set_ep_tx_sw_buf(uint8 ep) {
-  usb_set_ep_dtog_rx(ep);
+    usb_set_ep_dtog_rx(ep);
 }
 
 static inline void usb_set_ep_rx_stat(uint8 ep, uint32 status) {
@@ -317,13 +317,13 @@ static inline void usb_set_ep_kind(uint8 ep, uint32 kind) {
 }
 
 static inline uint32 usb_get_ep_type(uint8 ep) {
-  uint32 epr = USB_BASE->EP[ep];
-  return epr & USB_EP_EP_TYPE;
+    uint32 epr = USB_BASE->EP[ep];
+    return epr & USB_EP_EP_TYPE;
 }
 
 static inline uint32 usb_get_ep_kind(uint8 ep) {
-  uint32 epr = USB_BASE->EP[ep];
-  return epr & USB_EP_EP_TYPE;
+    uint32 epr = USB_BASE->EP[ep];
+    return epr & USB_EP_EP_TYPE;
 }
 
 
@@ -471,7 +471,6 @@ static inline uint16 usb_get_ep_tx_count(uint8 ep) {
 }
 
 static inline void usb_set_ep_tx_count(uint8 ep, uint16 count) {
-  // XX what if > 62??
     uint32 *txc = usb_ep_tx_count_ptr(ep);
     *txc = count;
 }
@@ -490,96 +489,96 @@ void usb_set_ep_rx_count(uint8 ep, uint16 count);
 
 /* double buffer definitions */
 static inline uint32* usb_get_ep_tx_buf0_addr_ptr(uint8 ep) {
-  return usb_ep_tx_addr_ptr(ep);
+    return usb_ep_tx_addr_ptr(ep);
 }
 
 static inline uint16 usb_get_ep_tx_buf0_addr(uint8 ep) {
-  return usb_get_ep_tx_addr(ep);
+    return usb_get_ep_tx_addr(ep);
 }
 
 static inline void usb_set_ep_tx_buf0_addr(uint8 ep, uint16 addr) {
-  usb_set_ep_tx_addr(ep, addr);
+    usb_set_ep_tx_addr(ep, addr);
 }
 
 static inline uint32* usb_get_ep_tx_buf1_addr_ptr(uint8 ep) {
-  return usb_ep_rx_addr_ptr(ep);
+    return usb_ep_rx_addr_ptr(ep);
 }
 
 static inline uint16 usb_get_ep_tx_buf1_addr(uint8 ep)  {
-  return usb_get_ep_rx_addr(ep);
+    return usb_get_ep_rx_addr(ep);
 }
 
 static inline void usb_set_ep_tx_buf1_addr(uint8 ep, uint16 addr) {
-  usb_set_ep_rx_addr(ep, addr);
+    usb_set_ep_rx_addr(ep, addr);
 }
 
 static inline uint32* usb_ep_tx_buf0_count_ptr(uint8 ep) {
-  return usb_ep_tx_count_ptr(ep);
+    return usb_ep_tx_count_ptr(ep);
 }
 
 static inline uint16 usb_get_ep_tx_buf0_count(uint8 ep) {
-  return usb_get_ep_tx_count(ep);
+    return usb_get_ep_tx_count(ep);
 }
 
 static inline void usb_set_ep_tx_buf0_count(uint8 ep, uint16 count) {
-  usb_set_ep_tx_count(ep, count);
+    usb_set_ep_tx_count(ep, count);
 }
 
 static inline uint32* usb_ep_tx_buf1_count_ptr(uint8 ep) {
-  return usb_ep_rx_count_ptr(ep);
+    return usb_ep_rx_count_ptr(ep);
 }
 
 static inline uint16 usb_get_ep_tx_buf1_count(uint8 ep) {
-  return usb_get_ep_rx_count(ep);
+    return usb_get_ep_rx_count(ep);
 }
 
 static inline void usb_set_ep_tx_buf1_count(uint8 ep, uint16 count) {
-  usb_set_ep_rx_count(ep, count);
+    usb_set_ep_rx_count(ep, count);
 }
 static inline uint32* usb_get_ep_rx_buf0_addr_ptr(uint8 ep) {
-  return usb_ep_tx_addr_ptr(ep);
+    return usb_ep_tx_addr_ptr(ep);
 }
 
 static inline uint16 usb_get_ep_rx_buf0_addr(uint8 ep) {
-  return usb_get_ep_tx_addr(ep);
+    return usb_get_ep_tx_addr(ep);
 }
 
 static inline void usb_set_ep_rx_buf0_addr(uint8 ep, uint16 addr) {
-  usb_set_ep_tx_addr(ep, addr);
+    usb_set_ep_tx_addr(ep, addr);
 }
 
 static inline uint32* usb_get_ep_rx_buf1_addr_ptr(uint8 ep) {
-  return usb_ep_rx_addr_ptr(ep);
+    return usb_ep_rx_addr_ptr(ep);
 }
 
 static inline uint16 usb_get_ep_rx_buf1_addr(uint8 ep) {
-  return usb_get_ep_rx_addr(ep);
+    return usb_get_ep_rx_addr(ep);
 }
 
 static inline void usb_set_ep_rx_buf1_addr(uint8 ep, uint16 addr) {
-  usb_set_ep_rx_addr(ep, addr);
+    usb_set_ep_rx_addr(ep, addr);
 }
 
 static inline uint32* usb_ep_rx_buf0_count_ptr(uint8 ep) {
-  return usb_ep_tx_count_ptr(ep);
+    return usb_ep_tx_count_ptr(ep);
 }
 
 static inline uint16 usb_get_ep_rx_buf0_count(uint8 ep) {
-  return usb_get_ep_tx_count(ep);
+    return usb_get_ep_tx_count(ep);
 }
 
 void usb_set_ep_rx_buf0_count(uint8 ep, uint16 count);
 
 static inline uint32* usb_ep_rx_buf1_count_ptr(uint8 ep) {
-  return usb_ep_rx_count_ptr(ep);
+    return usb_ep_rx_count_ptr(ep);
 }
 
 static inline uint16 usb_get_ep_rx_buf1_count(uint8 ep) {
-  return usb_get_ep_rx_count(ep);
+    return usb_get_ep_rx_count(ep);
 }
 
 static inline void usb_set_ep_rx_buf1_count(uint8 ep, uint16 count) {
-  usb_set_ep_rx_count(ep, count);
+    usb_set_ep_rx_count(ep, count);
 }
 
 /*

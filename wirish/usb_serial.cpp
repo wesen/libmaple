@@ -95,8 +95,8 @@ void USBSerial::write(const void *buf, uint32 len) {
     uint32 sent = 0;
 
     while (txed < len && (millis() - start < USB_TIMEOUT)) {
-      sent = usb_cdcacm_tx((const uint8*)buf + txed, len - txed);
-      txed += sent;
+        sent = usb_cdcacm_tx((const uint8*)buf + txed, len - txed);
+        txed += sent;
         if (old_txed != txed) {
             start = millis();
         }
@@ -105,12 +105,11 @@ void USBSerial::write(const void *buf, uint32 len) {
 
 
     if (sent == USB_CDCACM_TX_EPSIZE) {
-      while (usb_cdcacm_get_pending() != 0) {
-      }
-      /* flush out to avoid having the pc wait for more data */
-      usb_cdcacm_tx(NULL, 0);
+        while (usb_cdcacm_is_transmitting() != 0) {
+        }
+        /* flush out to avoid having the pc wait for more data */
+        usb_cdcacm_tx(NULL, 0);
     }
-
 }
 
 uint32 USBSerial::available(void) {
