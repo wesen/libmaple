@@ -46,78 +46,10 @@
  *                    ..., FLASH_WAIT_STATE_7).
  */
 void flash_set_latency(uint32 wait_states) {
-  uint32 val = FLASH_BASE->ACR;
+    uint32 val = FLASH_BASE->ACR;
 
-  val &= ~FLASH_ACR_LATENCY;
-  val |= wait_states;
+    val &= ~FLASH_ACR_LATENCY;
+    val |= wait_states;
 
-  FLASH_BASE->ACR = val;
-}
-
-#define FLASH_KEY1     0x45670123
-#define FLASH_KEY2     0xCDEF89AB
-
-void flash_unlock() {
-  FLASH_BASE->KEYR = FLASH_KEY1;
-  FLASH_BASE->KEYR = FLASH_KEY2;
-}
-
-void flash_lock() {
-  FLASH_BASE->CR = 0x00000080;
-}
-
-inline void flash_wait_busy() {
-  while (FLASH_BASE->SR & FLASH_SR_BSY) {
-    ;
-  }
-}
-
-uint8 flash_erase_page(uint32 page_address) {
-  uint32 rwm_val = FLASH_BASE->CR;
-  rwm_val = FLASH_CR_PER;
-  FLASH_BASE->CR = rwm_val;
-
-  flash_wait_busy();
-
-  FLASH_BASE->AR = page_address;
-  FLASH_BASE->CR = FLASH_CR_STRT | FLASH_CR_PER;
-  flash_wait_busy();
-
-  rwm_val = 0x00;
-  FLASH_BASE->CR = rwm_val;
-
-  return 1;
-}
-
-uint8 flash_erase_pages(uint32 page_address, uint16 n) {
-  while (n-- > 0) {
-    if (!flash_erase_page(page_address + 0x800 * n)) {
-      return 0;
-    }
-  }
-  return 1;
-}
-
-uint8 flash_write_word(uint32 address, uint32 word) {
-  uint16 *flash_address = (uint16 *)address;
-  uint32 lh = (uint32)word & 0xFFFF;
-  uint32 hh = ((uint32)word & 0xFFFF0000) >> 16;
-
-  uint32 rwm_val = FLASH_BASE->CR;
-  FLASH_BASE->CR = FLASH_CR_PG;
-
-  flash_wait_busy();
-  *(flash_address + 0x01) = (uint16)hh;
-  flash_wait_busy();
-  *flash_address = (uint16)lh;
-  flash_wait_busy();
-
-  rwm_val &= 0xFFFFFFFE;
-  FLASH_BASE->CR = rwm_val;
-
-  if (*(uint32 *)address != word) {
-    return 0;
-  }
-
-  return 1;
+    FLASH_BASE->ACR = val;
 }

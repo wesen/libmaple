@@ -47,63 +47,57 @@ extern "C" {
 #define FLASH_WAIT_STATE_6              0x6
 #define FLASH_WAIT_STATE_7              0x7
 
-  /* The series header must define:
-   *
-   * - FLASH_SAFE_WAIT_STATES, the smallest number of wait states that
-   *   it is safe to use when SYSCLK is at its fastest documented rate
-   *   and the MCU is powered at 3.3V (i.e. this doesn't consider
-   *   overclocking or low voltage operation).
-   *
-   * - The following bit flags, for flash_enable_features():
-   *
-   *       -- FLASH_PREFETCH: prefetcher
-   *       -- FLASH_ICACHE: instruction cache
-   *       -- FLASH_DCACHE: data cache
-   *
-   *   See that function's Doxygen for more restrictions.
-   */
+/* The series header must define:
+ *
+ * - FLASH_SAFE_WAIT_STATES, the smallest number of wait states that
+ *   it is safe to use when SYSCLK is at its fastest documented rate
+ *   and the MCU is powered at 3.3V (i.e. this doesn't consider
+ *   overclocking or low voltage operation).
+ *
+ * - The following bit flags, for flash_enable_features():
+ *
+ *       -- FLASH_PREFETCH: prefetcher
+ *       -- FLASH_ICACHE: instruction cache
+ *       -- FLASH_DCACHE: data cache
+ *
+ *   See that function's Doxygen for more restrictions.
+ */
 #include <series/flash.h>
 
 #ifdef __DOXYGEN__
-  /** Flash register map base pointer. */
+/** Flash register map base pointer. */
 #define FLASH_BASE
 #endif
 
-  /*
-   * Flash routines
-   */
+/*
+ * Flash routines
+ */
 
-  void flash_set_latency(uint32 wait_states);
+void flash_set_latency(uint32 wait_states);
 
-  /**
-   * @brief Enable Flash memory features
-   *
-   * If the target MCU doesn't provide a feature (e.g. instruction and
-   * data caches on the STM32F1), the flag will be ignored. This allows
-   * using these flags unconditionally, with the desired effect taking
-   * place on targets that support them.
-   *
-   * @param feature_flags Bitwise OR of the following:
-   *                      FLASH_PREFETCH (turns on prefetcher),
-   *                      FLASH_ICACHE (turns on instruction cache),
-   *                      FLASH_DCACHE (turns on data cache).
-   */
-  static inline void flash_enable_features(uint32 feature_flags) {
+/**
+ * @brief Enable Flash memory features
+ *
+ * If the target MCU doesn't provide a feature (e.g. instruction and
+ * data caches on the STM32F1), the flag will be ignored. This allows
+ * using these flags unconditionally, with the desired effect taking
+ * place on targets that support them.
+ *
+ * @param feature_flags Bitwise OR of the following:
+ *                      FLASH_PREFETCH (turns on prefetcher),
+ *                      FLASH_ICACHE (turns on instruction cache),
+ *                      FLASH_DCACHE (turns on data cache).
+ */
+static inline void flash_enable_features(uint32 feature_flags) {
     FLASH_BASE->ACR |= feature_flags;
-  }
+}
 
-  /**
-   * @brief Deprecated. Use flash_enable_features(FLASH_PREFETCH) instead.
-   */
-  static inline void flash_enable_prefetch(void) {
+/**
+ * @brief Deprecated. Use flash_enable_features(FLASH_PREFETCH) instead.
+ */
+static inline void flash_enable_prefetch(void) {
     flash_enable_features(FLASH_PREFETCH);
-  }
-
-  void flash_unlock();
-  void flash_lock();
-  uint8 flash_erase_page(uint32 page_address);
-  uint8 flash_erase_pages(uint32 page_address, uint16 n);
-  uint8 flash_write_word(uint32 address, uint32 word);
+}
 
 #ifdef __cplusplus
 }
