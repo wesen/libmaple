@@ -53,5 +53,11 @@ $(BUILD_PATH)/%.o: %.c
 $(BUILD_PATH)/%.o: %.cpp
 	$(SILENT_CXX) $(CXX) $(CFLAGS) $(CXXFLAGS) -MMD -MP -MF $(@:%.o=%.d) -MT $@ -o $@ -c $<
 
+$(BUILD_PATH)/%.s: %.c
+	$(SILENT_CC) $(CC) $(CFLAGS) -o $@ -fverbose-asm -S $<
+
+$(BUILD_PATH)/%.s: %.cpp
+	$(SILENT_CXX) $(CXX) $(CFLAGS) $(CXXFLAGS) -fverbose-asm -o $@ -S $<
+
 $(BUILD_PATH)/%.o: %.S
 	$(SILENT_AS) $(AS) $(ASFLAGS) -MMD -MP -MF $(@:%.o=%.d) -MT $@ -o $@ -c $<
