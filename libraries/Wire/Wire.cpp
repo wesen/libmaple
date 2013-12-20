@@ -49,10 +49,11 @@
 
 void TwoWire::set_scl(bool state) {
     I2C_DELAY(this->i2c_delay);
-    digitalWrite(this->scl_pin,state);
+    digitalWrite(this->scl_pin, state);
+
     //Allow for clock stretching - dangerous currently
     if (state == HIGH) {
-        while(digitalRead(this->scl_pin) == 0);
+        while (digitalRead(this->scl_pin) == 0) ;
     }
 }
 
@@ -162,15 +163,36 @@ TwoWire::TwoWire(uint8 scl, uint8 sda, uint8 delay) : i2c_delay(delay) {
     this->sda_pin=sda;
 }
 
-void TwoWire::begin(uint8 self_addr) {
+bool TwoWire::begin(uint8 self_addr, int timeoutMs) {
     tx_buf_idx = 0;
     tx_buf_overflow = false;
     rx_buf_idx = 0;
     rx_buf_len = 0;
     pinMode(this->scl_pin, OUTPUT_OPEN_DRAIN);
     pinMode(this->sda_pin, OUTPUT_OPEN_DRAIN);
-    set_scl(HIGH);
+
+    // handle timeout here in case there is no device connected
+    {
+      //    set_scl(HIGH);
+      I2C_DELAY(this->i2c_delay);
+      digitalWrite(this->scl_pin, HIGH);
+
+      int timeoutUs = timeoutMs * 1000;
+      //Allow for clock stretching - dangerous currently
+      while (digitalRead(this->scl_pin) == 0) {
+        if (timeoutMs > 0) {
+          if (timeoutUs <= 0) {
+            // timed out, we don't have a slave or so
+            return false;
+          }
+          delay_us(100);
+          timeoutUs -= 100;
+        }
+      }
+    }
+
     set_sda(HIGH);
+    return true;
 }
 
 TwoWire::~TwoWire() {
