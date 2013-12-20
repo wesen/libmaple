@@ -41,11 +41,12 @@
 #include <Wire/WireBase.h>
 #include <wirish/wirish.h>
 
-void WireBase::begin(uint8 self_addr) {
+bool WireBase::begin(uint8 self_addr, int timeoutMs) {
     tx_buf_idx = 0;
     tx_buf_overflow = false;
     rx_buf_idx = 0;
     rx_buf_len = 0;
+    return true;
 }
 
 void WireBase::beginTransmission(uint8 slave_address) {

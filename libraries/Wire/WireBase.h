@@ -74,7 +74,7 @@ public:
      * Initialises the class interface
      */
     // Allow derived classes to overwrite begin function
-    virtual void begin(uint8 = 0x00);
+    virtual bool begin(uint8 = 0x00, int timeoutMs = 0);
 
     /*
      * Sets up the transmission message to be processed

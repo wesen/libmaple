@@ -123,7 +123,7 @@ class TwoWire : public WireBase {
      * master. This function overwrites the default behaviour of
      * .begin(uint8) in WireBase
      */
-    void begin(uint8 = 0x00);
+    bool begin(uint8 = 0x00, int timeoutMs = 0);
 
     /*
      * If object is destroyed, set pin numbers to 0.
