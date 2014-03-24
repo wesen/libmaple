@@ -55,8 +55,9 @@ typedef void (*voidArgumentFuncPtr)(void *);
 #define __packed __attribute__((__packed__))
 #define __deprecated __attribute__((__deprecated__))
 #define __weak __attribute__((weak))
-#define __always_inline inline __attribute__((always_inline))
+#ifndef __unused
 #define __unused __attribute__((unused))
+#endif
 
 #ifndef NULL
 #define NULL 0
