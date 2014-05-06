@@ -58,14 +58,14 @@ uint16 SaveRState;              /* caches RX status for later use */
  */
 
 typedef enum {
-    RESUME_EXTERNAL,
-    RESUME_INTERNAL,
-    RESUME_LATER,
-    RESUME_WAIT,
-    RESUME_START,
-    RESUME_ON,
-    RESUME_OFF,
-    RESUME_ESOF
+    RESUME_EXTERNAL = 0,
+    RESUME_INTERNAL = 1,
+    RESUME_LATER = 2,
+    RESUME_WAIT = 3,
+    RESUME_START = 4,
+    RESUME_ON = 5,
+    RESUME_OFF = 6,
+    RESUME_ESOF = 7
 } RESUME_STATE;
 
 struct {
@@ -111,8 +111,20 @@ static void usb_suspend(void) {
     /* TODO decide if read/modify/write is really what we want
      * (e.g. usb_resume_init() reconfigures CNTR). */
     cntr = USB_BASE->CNTR;
+    /**
+      * From STM32 reference:
+      *
+      * This action activates the suspend mode within the USB peripheral.
+      * As soon as the suspend mode is activated,
+      * the check on SOF reception is disabled to avoid any further
+      * SUSP interrupts being issued while the USB is suspended.
+      **/
     cntr |= USB_CNTR_FSUSP;
     USB_BASE->CNTR = cntr;
+    /**
+      * Set LP_MODE bit in USB_CNTR register to 1 to remove static power consumption
+      * in the analog USB transceivers but keeping them able to detect resume activity.
+      */
     cntr |= USB_CNTR_LP_MODE;
     USB_BASE->CNTR = cntr;
 
@@ -142,7 +154,9 @@ static void usb_resume(RESUME_STATE eResumeSetVal) {
     case RESUME_EXTERNAL:
         usb_resume_init();
         ResumeS.eState = RESUME_OFF;
-        USBLIB->state = USBLIB->prevState;
+        if (USB_BASE->FNR & USB_FNR_RXDM) {
+            USBLIB->state = USBLIB->prevState;
+        }
         break;
     case RESUME_INTERNAL:
         usb_resume_init();
